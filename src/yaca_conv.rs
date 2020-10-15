@@ -3,13 +3,13 @@ use libc::{c_int, size_t};
 use crate::*;
 
 
-const BASE_ERROR_YACA: c_int              = -0x01E30000;
-const YACA_ERROR_NONE: c_int              = 0;
+const BASE_ERROR_YACA:              c_int = -0x01E30000;
+const YACA_ERROR_NONE:              c_int = 0;
 const YACA_ERROR_INVALID_PARAMETER: c_int = -22;
-const YACA_ERROR_OUT_OF_MEMORY: c_int     = -12;
-const YACA_ERROR_INTERNAL: c_int          = BASE_ERROR_YACA | 0x01;
-const YACA_ERROR_DATA_MISMATCH: c_int     = BASE_ERROR_YACA | 0x02;
-const YACA_ERROR_INVALID_PASSWORD: c_int  = BASE_ERROR_YACA | 0x03;
+const YACA_ERROR_OUT_OF_MEMORY:     c_int = -12;
+const YACA_ERROR_INTERNAL:          c_int = BASE_ERROR_YACA | 0x01;
+const YACA_ERROR_DATA_MISMATCH:     c_int = BASE_ERROR_YACA | 0x02;
+const YACA_ERROR_INVALID_PASSWORD:  c_int = BASE_ERROR_YACA | 0x03;
 
 pub fn res_c_to_rs(r: c_int) -> crate::Result<()>
 {
@@ -37,20 +37,20 @@ pub fn res_c_to_rs_bool(r: c_int) -> crate::Result<bool>
     }
 }
 
-const YACA_KEY_TYPE_SYMMETRIC: c_int  = 0;
-const YACA_KEY_TYPE_DES: c_int        = 1;
-const YACA_KEY_TYPE_IV: c_int         = 2;
-const YACA_KEY_TYPE_RSA_PUB: c_int    = 3;
-const YACA_KEY_TYPE_RSA_PRIV: c_int   = 4;
-const YACA_KEY_TYPE_DSA_PUB: c_int    = 5;
-const YACA_KEY_TYPE_DSA_PRIV: c_int   = 6;
-const YACA_KEY_TYPE_DH_PUB: c_int     = 7;
-const YACA_KEY_TYPE_DH_PRIV: c_int    = 8;
-const YACA_KEY_TYPE_EC_PUB: c_int     = 9;
-const YACA_KEY_TYPE_EC_PRIV: c_int    = 10;
+const YACA_KEY_TYPE_SYMMETRIC:  c_int = 0;
+const YACA_KEY_TYPE_DES:        c_int = 1;
+const YACA_KEY_TYPE_IV:         c_int = 2;
+const YACA_KEY_TYPE_RSA_PUB:    c_int = 3;
+const YACA_KEY_TYPE_RSA_PRIV:   c_int = 4;
+const YACA_KEY_TYPE_DSA_PUB:    c_int = 5;
+const YACA_KEY_TYPE_DSA_PRIV:   c_int = 6;
+const YACA_KEY_TYPE_DH_PUB:     c_int = 7;
+const YACA_KEY_TYPE_DH_PRIV:    c_int = 8;
+const YACA_KEY_TYPE_EC_PUB:     c_int = 9;
+const YACA_KEY_TYPE_EC_PRIV:    c_int = 10;
 const YACA_KEY_TYPE_DSA_PARAMS: c_int = 11;
-const YACA_KEY_TYPE_DH_PARAMS: c_int  = 12;
-const YACA_KEY_TYPE_EC_PARAMS: c_int  = 13;
+const YACA_KEY_TYPE_DH_PARAMS:  c_int = 12;
+const YACA_KEY_TYPE_EC_PARAMS:  c_int = 13;
 
 
 pub fn key_type_rs_to_c(kt: &KeyType) -> c_int
@@ -97,9 +97,9 @@ pub fn key_type_c_to_rs(kt: c_int) -> KeyType
 
 const YACA_KEY_LENGTH_EC_PRIME192V1: c_int = 0x300000C0;
 const YACA_KEY_LENGTH_EC_PRIME256V1: c_int = 0x30000100;
-const YACA_KEY_LENGTH_EC_SECP256K1: c_int  = 0x31200100;
-const YACA_KEY_LENGTH_EC_SECP384R1: c_int  = 0x31100180;
-const YACA_KEY_LENGTH_EC_SECP521R1: c_int  = 0x31100209;
+const YACA_KEY_LENGTH_EC_SECP256K1:  c_int = 0x31200100;
+const YACA_KEY_LENGTH_EC_SECP384R1:  c_int = 0x31100180;
+const YACA_KEY_LENGTH_EC_SECP521R1:  c_int = 0x31100209;
 
 const YACA_KEY_LENGTH_DH_RFC_1024_160: c_int = 0x20000400;
 const YACA_KEY_LENGTH_DH_RFC_2048_224: c_int = 0x21000800;
@@ -146,7 +146,7 @@ pub fn key_length_c_to_rs(kl: size_t) -> KeyLength
 // instead of those conversions, those below should be 1:1 with C
 
 const YACA_KEY_FORMAT_DEFAULT: c_int = 0;
-const YACA_KEY_FORMAT_PKCS8: c_int   = 1;
+const YACA_KEY_FORMAT_PKCS8:   c_int = 1;
 
 pub fn key_format_rs_to_c(kf: &KeyFormat) -> c_int
 {
@@ -156,10 +156,10 @@ pub fn key_format_rs_to_c(kf: &KeyFormat) -> c_int
     }
 }
 
-const YACA_KEY_FILE_FORMAT_RAW: c_int    = 0;
+const YACA_KEY_FILE_FORMAT_RAW:    c_int = 0;
 const YACA_KEY_FILE_FORMAT_BASE64: c_int = 1;
-const YACA_KEY_FILE_FORMAT_PEM: c_int    = 2;
-const YACA_KEY_FILE_FORMAT_DER: c_int    = 3;
+const YACA_KEY_FILE_FORMAT_PEM:    c_int = 2;
+const YACA_KEY_FILE_FORMAT_DER:    c_int = 3;
 
 pub fn key_file_format_rs_to_c(kff: &KeyFileFormat) -> c_int
 {
@@ -171,8 +171,8 @@ pub fn key_file_format_rs_to_c(kff: &KeyFileFormat) -> c_int
     }
 }
 
-const YACA_DIGEST_MD5: c_int    = 0;
-const YACA_DIGEST_SHA1: c_int   = 1;
+const YACA_DIGEST_MD5:    c_int = 0;
+const YACA_DIGEST_SHA1:   c_int = 1;
 const YACA_DIGEST_SHA224: c_int = 2;
 const YACA_DIGEST_SHA256: c_int = 3;
 const YACA_DIGEST_SHA384: c_int = 4;
@@ -190,13 +190,13 @@ pub fn digest_rs_to_c(digest: &DigestAlgorithm) -> c_int
     }
 }
 
-const YACA_ENCRYPT_AES: c_int               = 0;
-const YACA_ENCRYPT_UNSAFE_DES: c_int        = 1;
+const YACA_ENCRYPT_AES:               c_int = 0;
+const YACA_ENCRYPT_UNSAFE_DES:        c_int = 1;
 const YACA_ENCRYPT_UNSAFE_3DES_2TDEA: c_int = 2;
-const YACA_ENCRYPT_3DES_3TDEA: c_int        = 3;
-const YACA_ENCRYPT_UNSAFE_RC2: c_int        = 4;
-const YACA_ENCRYPT_UNSAFE_RC4: c_int        = 5;
-const YACA_ENCRYPT_CAST5: c_int             = 6;
+const YACA_ENCRYPT_3DES_3TDEA:        c_int = 3;
+const YACA_ENCRYPT_UNSAFE_RC2:        c_int = 4;
+const YACA_ENCRYPT_UNSAFE_RC4:        c_int = 5;
+const YACA_ENCRYPT_CAST5:             c_int = 6;
 
 pub fn encrypt_rs_to_c(encrypt: &EncryptAlgorithm) -> c_int
 {
@@ -212,15 +212,15 @@ pub fn encrypt_rs_to_c(encrypt: &EncryptAlgorithm) -> c_int
 }
 
 const YACA_BCM_NONE: c_int = 0;
-const YACA_BCM_ECB: c_int  = 1;
-const YACA_BCM_CTR: c_int  = 2;
-const YACA_BCM_CBC: c_int  = 3;
-const YACA_BCM_GCM: c_int  = 4;
-const YACA_BCM_CFB: c_int  = 5;
+const YACA_BCM_ECB:  c_int = 1;
+const YACA_BCM_CTR:  c_int = 2;
+const YACA_BCM_CBC:  c_int = 3;
+const YACA_BCM_GCM:  c_int = 4;
+const YACA_BCM_CFB:  c_int = 5;
 const YACA_BCM_CFB1: c_int = 6;
 const YACA_BCM_CFB8: c_int = 7;
-const YACA_BCM_OFB: c_int  = 8;
-const YACA_BCM_CCM: c_int  = 9;
+const YACA_BCM_OFB:  c_int = 8;
+const YACA_BCM_CCM:  c_int = 9;
 const YACA_BCM_WRAP: c_int = 10;
 
 pub fn bcm_rs_to_c(bcm: &BlockCipherMode) -> c_int
@@ -240,13 +240,13 @@ pub fn bcm_rs_to_c(bcm: &BlockCipherMode) -> c_int
     }
 }
 
-const YACA_PROPERTY_PADDING: c_int                = 0;
-const YACA_PROPERTY_GCM_AAD: c_int                = 1;
-const YACA_PROPERTY_GCM_TAG: c_int                = 2;
-const YACA_PROPERTY_GCM_TAG_LEN: c_int            = 3;
-const YACA_PROPERTY_CCM_AAD: c_int                = 4;
-const YACA_PROPERTY_CCM_TAG: c_int                = 5;
-const YACA_PROPERTY_CCM_TAG_LEN: c_int            = 6;
+const YACA_PROPERTY_PADDING:                c_int = 0;
+const YACA_PROPERTY_GCM_AAD:                c_int = 1;
+const YACA_PROPERTY_GCM_TAG:                c_int = 2;
+const YACA_PROPERTY_GCM_TAG_LEN:            c_int = 3;
+const YACA_PROPERTY_CCM_AAD:                c_int = 4;
+const YACA_PROPERTY_CCM_TAG:                c_int = 5;
+const YACA_PROPERTY_CCM_TAG_LEN:            c_int = 6;
 const YACA_PROPERTY_RC2_EFFECTIVE_KEY_BITS: c_int = 7;
 
 pub fn property_rs_to_c(prop: &types::Property) -> c_int
@@ -263,13 +263,13 @@ pub fn property_rs_to_c(prop: &types::Property) -> c_int
     }
 }
 
-const YACA_PADDING_NONE: c_int         = 0;
-const YACA_PADDING_X931: c_int         = 1;
-const YACA_PADDING_PKCS1: c_int        = 2;
-const YACA_PADDING_PKCS1_PSS: c_int    = 3;
-const YACA_PADDING_PKCS1_OAEP: c_int   = 4;
+const YACA_PADDING_NONE:         c_int = 0;
+const YACA_PADDING_X931:         c_int = 1;
+const YACA_PADDING_PKCS1:        c_int = 2;
+const YACA_PADDING_PKCS1_PSS:    c_int = 3;
+const YACA_PADDING_PKCS1_OAEP:   c_int = 4;
 const YACA_PADDING_PKCS1_SSLV23: c_int = 5;
-const YACA_PADDING_PKCS7: c_int        = 6;
+const YACA_PADDING_PKCS7:        c_int = 6;
 
 pub fn padding_rs_to_c(pad: &Padding) -> c_int
 {

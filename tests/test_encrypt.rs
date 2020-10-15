@@ -127,8 +127,7 @@ fn encrypt_ccm_property()
     let ctx = EncryptContext::initialize(&EncryptAlgorithm::Aes, &BlockCipherMode::Ccm,
                                          &key_sym, Some(&key_iv_64)).unwrap();
     ctx.set_property_ccm_tag_len(tag_len).unwrap();
-    ctx.set_input_length(common::MSG.len()).unwrap();
-    ctx.set_property_ccm_aad(&aad).unwrap();
+    ctx.set_property_ccm_aad(&aad, common::MSG.len()).unwrap();
 
     let mut enc: Vec<u8> = Vec::new();
     enc.append(&mut ctx.update(common::MSG).unwrap());
@@ -139,8 +138,7 @@ fn encrypt_ccm_property()
     let ctx = DecryptContext::initialize(&EncryptAlgorithm::Aes, &BlockCipherMode::Ccm,
                                          &key_sym, Some(&key_iv_64)).unwrap();
     ctx.set_property_ccm_tag(&tag).unwrap();
-    ctx.set_input_length(enc.len()).unwrap();
-    ctx.set_property_ccm_aad(&aad).unwrap();
+    ctx.set_property_ccm_aad(&aad, enc.len()).unwrap();
 
     let mut dec: Vec<u8> = Vec::new();
     dec.append(&mut ctx.update(&enc).unwrap());

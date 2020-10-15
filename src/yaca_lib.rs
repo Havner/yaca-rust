@@ -1,13 +1,12 @@
 use libc::{c_char, c_int, c_void, size_t};
 
 
-#[allow(dead_code)]
 #[link(name = "yaca")]
 extern {
     // crypto
     pub fn yaca_initialize() -> c_int;
-    pub fn yaca_cleanup() -> ();
-    pub fn yaca_free(memory: *mut c_void) -> ();
+    pub fn yaca_cleanup();
+    pub fn yaca_free(memory: *mut c_void);
     pub fn yaca_memcmp(first: *const c_void, second: *const c_void, len: size_t) -> c_int;
     pub fn yaca_randomize_bytes(data: *mut c_char, data_len: size_t) -> c_int;
     pub fn yaca_context_set_property(ctx: *mut c_void, property: c_int,
@@ -16,7 +15,7 @@ extern {
                                      value: *mut *const c_void, value_len: *mut size_t) -> c_int;
     pub fn yaca_context_get_output_length(ctx: *const c_void, input_len: size_t,
                                           output_len: *mut size_t) -> c_int;
-    pub fn yaca_context_destroy(ctx: *mut c_void) -> ();
+    pub fn yaca_context_destroy(ctx: *mut c_void);
 
     // key
     pub fn yaca_key_get_type(key: *const c_void, key_type: *mut c_int) -> c_int;
@@ -46,7 +45,7 @@ extern {
                                   salt_len: size_t, iterations: size_t,
                                   algo: c_int, key_bit_len: size_t,
                                   key: *mut *const c_void) -> c_int;
-    pub fn yaca_key_destroy(key: *mut c_void) -> c_int;
+    pub fn yaca_key_destroy(key: *mut c_void);
 
     // simple
     pub fn yaca_simple_encrypt(algo: c_int, bcm: c_int,

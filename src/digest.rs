@@ -21,6 +21,8 @@ impl Drop for DigestContext {
     }
 }
 
+impl crypto::Sealed for DigestContext {}
+
 impl Context for DigestContext {
     fn get_handle(&self) -> *mut c_void
     {
@@ -47,8 +49,8 @@ impl DigestContext {
 }
 
 
-/// Initializes a digest context.
-pub fn digest_initialize(algo: &DigestAlgorithm) -> Result<DigestContext>
+#[inline]
+fn digest_initialize(algo: &DigestAlgorithm) -> Result<DigestContext>
 {
     let algo = conv::digest_rs_to_c(algo);
     let mut handle: *mut c_void = ptr::null_mut();
@@ -60,8 +62,8 @@ pub fn digest_initialize(algo: &DigestAlgorithm) -> Result<DigestContext>
     Ok(DigestContext{handle})
 }
 
-/// Feeds the message into the message digest algorithm.
-pub fn digest_update(ctx: &DigestContext, message: &[u8]) -> Result<()>
+#[inline]
+fn digest_update(ctx: &DigestContext, message: &[u8]) -> Result<()>
 {
     let message_len: size_t = message.len();
     let message = message.as_ptr() as *const c_char;
@@ -71,8 +73,8 @@ pub fn digest_update(ctx: &DigestContext, message: &[u8]) -> Result<()>
     conv::res_c_to_rs(r)
 }
 
-/// Calculates the final digest.
-pub fn digest_finalize(ctx: &DigestContext) -> Result<Vec<u8>>
+#[inline]
+fn digest_finalize(ctx: &DigestContext) -> Result<Vec<u8>>
 {
     let output_len = ctx.get_output_length(0)?;
     assert!(output_len > 0);

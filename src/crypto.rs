@@ -10,12 +10,15 @@ use crate::*;
 
 // TRAITS
 
+// Not exported outside of the crate, used to c-seal the Context trait
+pub trait Sealed {}
+
 /// Trait for different contexts
-pub trait Context {
+pub trait Context: Sealed {
     fn get_handle(&self) -> *mut c_void;
     fn get_output_length(&self, input_len: usize) -> Result<usize>
     {
-        crypto::context_get_output_length(self, input_len)
+        context_get_output_length(self, input_len)
     }
 }
 
@@ -24,7 +27,8 @@ pub trait ContextWithPadding: Context {
     /// Sets the padding property.
     fn set_property_padding(&self, padding: &Padding) -> Result<()>
     {
-        context_set_property_padding(self, padding)
+        let value = conv::padding_rs_to_c(padding);
+        context_set_property_single(self, types::Property::Padding, value)
     }
 }
 
@@ -33,7 +37,7 @@ pub trait ContextWithRc2Supported: Context {
     /// Sets the RC2 effective key bits property.
     fn set_property_rc2_effective_key_bits(&self, rc2_eff_key_bits: usize) -> Result<()>
     {
-        context_set_property_rc2_effective_key_bits(self, rc2_eff_key_bits)
+        context_set_property_single(self, types::Property::Rc2EffectiveKeyBits, rc2_eff_key_bits)
     }
 }
 
@@ -42,32 +46,33 @@ pub trait ContextWithXcmEncryptProperties: Context {
     /// Sets the GCM AAD property.
     fn set_property_gcm_aad(&self, gcm_aad: &[u8]) -> Result<()>
     {
-        context_set_property_gcm_aad(self, gcm_aad)
+        context_set_property_multiple(self, types::Property::GcmAad, gcm_aad)
     }
     /// Sets the GCM tag length property.
     fn set_property_gcm_tag_len(&self, gcm_tag_len: usize) -> Result<()>
     {
-        context_set_property_gcm_tag_len(self, gcm_tag_len)
+        context_set_property_single(self, types::Property::GcmTagLen, gcm_tag_len as size_t)
     }
     /// Sets the CCM AAD property.
-    fn set_property_ccm_aad(&self, ccm_aad: &[u8]) -> Result<()>
-    {
-        context_set_property_ccm_aad(self, ccm_aad)
-    }
+    fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>;
+    // {
+    //     OPERATION_set_input_length(self, input_len)?;
+    //     crypto::context_set_property_multiple(ctx, types::Property::CcmAad, ccm_aad)
+    // }
     /// Sets the CCM tag length property.
     fn set_property_ccm_tag_len(&self, ccm_tag_len: usize) -> Result<()>
     {
-        context_set_property_ccm_tag_len(self, ccm_tag_len)
+        context_set_property_single(self, types::Property::CcmTagLen, ccm_tag_len)
     }
     /// Returns the GCM tag property.
     fn get_property_gcm_tag(&self) -> Result<Vec<u8>>
     {
-        context_get_property_gcm_tag(self)
+        context_get_property_multiple(self, types::Property::GcmTag)
     }
     /// Returns the CCM tag property.
     fn get_property_ccm_tag(&self) -> Result<Vec<u8>>
     {
-        context_get_property_ccm_tag(self)
+        context_get_property_multiple(self, types::Property::CcmTag)
     }
 }
 
@@ -76,27 +81,71 @@ pub trait ContextWithXcmDecryptProperties: Context {
     /// Sets the GCM AAD property.
     fn set_property_gcm_aad(&self, gcm_aad: &[u8]) -> Result<()>
     {
-        context_set_property_gcm_aad(self, gcm_aad)
+        context_set_property_multiple(self, types::Property::GcmAad, gcm_aad)
     }
     /// Sets the GCM tag property.
     fn set_property_gcm_tag(&self, gcm_tag: &[u8]) -> Result<()>
     {
-        context_set_property_gcm_tag(self, gcm_tag)
+        context_set_property_multiple(self, types::Property::GcmTag, gcm_tag)
     }
     /// Sets the CCM AAD property.
-    fn set_property_ccm_aad(&self, ccm_aad: &[u8]) -> Result<()>
-    {
-        context_set_property_ccm_aad(self, ccm_aad)
-    }
+    fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>;
+    // {
+    //     OPERATION_set_input_length(self, input_len)?;
+    //     crypto::context_set_property_multiple(ctx, types::Property::CcmAad, ccm_aad)
+    // }
     /// Sets the CCM tag property.
     fn set_property_ccm_tag(&self, ccm_tag: &[u8]) -> Result<()>
     {
-        context_set_property_ccm_tag(self, ccm_tag)
+        context_set_property_multiple(self, types::Property::CcmTag, ccm_tag)
     }
 }
 
 
-// PRIVATE FUNCTIONS, generics for context
+/// Initializes the library. Must be called before any other crypto
+/// function. Should be called once in each thread that uses yaca.
+pub fn initialize() -> Result<()>
+{
+    let r = unsafe { lib::yaca_initialize() };
+    conv::res_c_to_rs(r)
+}
+
+/// Cleans up the library.
+/// Must be called before exiting the thread that called yaca_initialize().
+pub fn cleanup()
+{
+    unsafe { lib::yaca_cleanup(); };
+}
+
+/// Safely compares first length bytes of two buffers.
+pub fn memcmp(first: &[u8], second: &[u8], length: usize) -> Result<bool>
+{
+    let min = std::cmp::min(first.len(), second.len());
+    assert!(length <= min);
+    let first = first.as_ptr() as *const c_void;
+    let second = second.as_ptr() as *const c_void;
+    let len: size_t = length;
+    let r = unsafe {
+        lib::yaca_memcmp(first, second, len)
+    };
+    conv::res_c_to_rs_bool(r)
+}
+
+/// Generates random data.
+pub fn random_bytes(length: usize) -> Result<Vec<u8>>
+{
+    let mut v: Vec<u8> = Vec::with_capacity(length);
+    let data = v.as_mut_ptr() as *mut c_char;
+    let data_len: size_t = length;
+    let r = unsafe {
+        lib::yaca_randomize_bytes(data, data_len)
+    };
+    conv::res_c_to_rs(r)?;
+    unsafe {
+        v.set_len(length);
+    }
+    Ok(v)
+}
 
 fn context_set_property_single<T, U>(ctx: &T, prop: types::Property,
                                      value: U) -> Result<()>
@@ -113,7 +162,8 @@ fn context_set_property_single<T, U>(ctx: &T, prop: types::Property,
     Ok(())
 }
 
-fn context_set_property_multiple<T, U>(ctx: &T, prop: types::Property,
+// Not exported outside of the crate, used by set_property_ccm_aad implementators
+pub fn context_set_property_multiple<T, U>(ctx: &T, prop: types::Property,
                                        value: &[U]) -> Result<()>
     where T: Context + ?Sized,
 {
@@ -163,133 +213,4 @@ fn context_get_output_length<T>(ctx: &T, input_len: usize) -> Result<usize>
     };
     conv::res_c_to_rs(r)?;
     Ok(output_len as usize)
-}
-
-
-// PUBLIC FUNCTIONS
-
-/// Initializes the library. Must be called before any other crypto
-/// function. Should be called once in each thread that uses yaca.
-pub fn initialize() -> Result<()>
-{
-    let r = unsafe { lib::yaca_initialize() };
-    conv::res_c_to_rs(r)
-}
-
-/// Cleans up the library.
-/// Must be called before exiting the thread that called yaca_initialize().
-pub fn cleanup()
-{
-    unsafe { lib::yaca_cleanup(); };
-}
-
-/// Safely compares first length bytes of two buffers.
-pub fn memcmp(first: &[u8], second: &[u8], length: usize) -> Result<bool>
-{
-    let min = std::cmp::min(first.len(), second.len());
-    assert!(length <= min);
-    let first = first.as_ptr() as *const c_void;
-    let second = second.as_ptr() as *const c_void;
-    let len: size_t = length;
-    let r = unsafe {
-        lib::yaca_memcmp(first, second, len)
-    };
-    conv::res_c_to_rs_bool(r)
-}
-
-/// Generates random data.
-pub fn random_bytes(length: usize) -> Result<Vec<u8>>
-{
-    let mut v: Vec<u8> = Vec::with_capacity(length);
-    let data = v.as_mut_ptr() as *mut c_char;
-    let data_len: size_t = length;
-    let r = unsafe {
-        lib::yaca_randomize_bytes(data, data_len)
-    };
-    conv::res_c_to_rs(r)?;
-    unsafe {
-        v.set_len(length);
-    }
-    Ok(v)
-}
-
-/// Sets the padding property.
-#[inline]
-pub fn context_set_property_padding<T>(ctx: &T, padding: &Padding) -> Result<()>
-    where T: Context + ?Sized,
-{
-    let value = conv::padding_rs_to_c(padding);
-    context_set_property_single(ctx, types::Property::Padding, value)
-}
-
-/// Sets the GCM AAD property.
-#[inline]
-pub fn context_set_property_gcm_aad<T>(ctx: &T, gcm_aad: &[u8]) -> Result<()>
-    where T: Context + ?Sized,
-{
-    context_set_property_multiple(ctx, types::Property::GcmAad, gcm_aad)
-}
-
-/// Sets the GCM tag property.
-#[inline]
-pub fn context_set_property_gcm_tag<T>(ctx: &T, gcm_tag: &[u8]) -> Result<()>
-    where T: Context + ?Sized,
-{
-    context_set_property_multiple(ctx, types::Property::GcmTag, gcm_tag)
-}
-
-/// Sets the GCM tag length property.
-#[inline]
-pub fn context_set_property_gcm_tag_len<T>(ctx: &T, gcm_tag_len: usize) -> Result<()>
-    where T: Context + ?Sized,
-{
-    context_set_property_single(ctx, types::Property::GcmTagLen, gcm_tag_len as size_t)
-}
-
-/// Sets the CCM AAD property.
-#[inline]
-pub fn context_set_property_ccm_aad<T>(ctx: &T, ccm_aad: &[u8]) -> Result<()>
-    where T: Context + ?Sized,
-{
-    context_set_property_multiple(ctx, types::Property::CcmAad, ccm_aad)
-}
-
-/// Sets the CCM tag property.
-#[inline]
-pub fn context_set_property_ccm_tag<T>(ctx: &T, ccm_tag: &[u8]) -> Result<()>
-    where T: Context + ?Sized,
-{
-    context_set_property_multiple(ctx, types::Property::CcmTag, ccm_tag)
-}
-
-/// Sets the CCM tag length property.
-#[inline]
-pub fn context_set_property_ccm_tag_len<T>(ctx: &T, ccm_tag_len: usize) -> Result<()>
-    where T: Context + ?Sized,
-{
-    context_set_property_single(ctx, types::Property::CcmTagLen, ccm_tag_len)
-}
-
-/// Sets the RC2 effective key bits property.
-#[inline]
-pub fn context_set_property_rc2_effective_key_bits<T>(ctx: &T, rc2_eff_key_bits: usize) -> Result<()>
-    where T: Context + ?Sized,
-{
-    context_set_property_single(ctx, types::Property::Rc2EffectiveKeyBits, rc2_eff_key_bits)
-}
-
-/// Returns the GCM tag property.
-#[inline]
-pub fn context_get_property_gcm_tag<T>(ctx: &T) -> Result<Vec<u8>>
-    where T: Context + ?Sized,
-{
-    context_get_property_multiple(ctx, types::Property::GcmTag)
-}
-
-/// Returns the CCM tag property.
-#[inline]
-pub fn context_get_property_ccm_tag<T>(ctx: &T) -> Result<Vec<u8>>
-    where T: Context + ?Sized,
-{
-    context_get_property_multiple(ctx, types::Property::CcmTag)
 }

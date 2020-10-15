@@ -23,6 +23,8 @@ impl Drop for SealContext {
     }
 }
 
+impl crypto::Sealed for SealContext {}
+
 impl Context for SealContext {
     fn get_handle(&self) -> *mut c_void
     {
@@ -32,7 +34,13 @@ impl Context for SealContext {
 
 impl ContextWithPadding for SealContext {}
 impl ContextWithRc2Supported for SealContext {}
-impl ContextWithXcmEncryptProperties for SealContext {}
+impl ContextWithXcmEncryptProperties for SealContext {
+    fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>
+    {
+        seal_set_input_length(self, input_len)?;
+        crypto::context_set_property_multiple(self, types::Property::CcmAad, ccm_aad)
+    }
+}
 
 impl SealContext {
     /// Initializes an encryption context.
@@ -40,11 +48,6 @@ impl SealContext {
                       sym_key_length: &KeyLength) -> Result<(SealContext, Key, Option<Key>)>
     {
         seal_initialize(pub_key, algo, bcm, sym_key_length)
-    }
-    /// Sets the total length of the input. This is only used for CCM_AAD.
-    pub fn set_input_length(&self, input_len: usize) -> Result<()>
-    {
-        seal_set_input_length(self, input_len)
     }
     /// Encrypts chunk of the data.
     pub fn update(&self, plaintext: &[u8]) -> Result<Vec<u8>>
@@ -58,9 +61,9 @@ impl SealContext {
     }
 }
 
-/// Initializes a seal context.
-pub fn seal_initialize(pub_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
-                       sym_key_length: &KeyLength) -> Result<(SealContext, Key, Option<Key>)>
+#[inline]
+fn seal_initialize(pub_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
+                   sym_key_length: &KeyLength) -> Result<(SealContext, Key, Option<Key>)>
 {
     let pub_key = key::get_handle(&pub_key);
     let algo = conv::encrypt_rs_to_c(algo);
@@ -86,8 +89,8 @@ pub fn seal_initialize(pub_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipher
     Ok((ctx, sym_key, iv))
 }
 
-/// Sets the total length of the input. This is only used for CCM_AAD.
-pub fn seal_set_input_length(ctx: &SealContext, input_len: usize) -> Result<()>
+#[inline]
+fn seal_set_input_length(ctx: &SealContext, input_len: usize) -> Result<()>
 {
     let ctx = ctx.get_handle();
     let plaintext = ptr::null() as *const c_char;
@@ -101,8 +104,8 @@ pub fn seal_set_input_length(ctx: &SealContext, input_len: usize) -> Result<()>
     Ok(())
 }
 
-/// Encrypts chunk of the data.
-pub fn seal_update(ctx: &SealContext, plaintext: &[u8]) -> Result<Vec<u8>>
+#[inline]
+fn seal_update(ctx: &SealContext, plaintext: &[u8]) -> Result<Vec<u8>>
 {
     let plaintext_len = plaintext.len();
     let output_len = ctx.get_output_length(plaintext_len)?;
@@ -125,8 +128,8 @@ pub fn seal_update(ctx: &SealContext, plaintext: &[u8]) -> Result<Vec<u8>>
     Ok(ciphertext_vec)
 }
 
-/// Encrypts the final chunk of the data.
-pub fn seal_finalize(ctx: &SealContext) -> Result<Vec<u8>>
+#[inline]
+fn seal_finalize(ctx: &SealContext) -> Result<Vec<u8>>
 {
     let output_len = ctx.get_output_length(0)?;
     let ctx = ctx.handle;
@@ -158,6 +161,8 @@ impl Drop for OpenContext {
     }
 }
 
+impl crypto::Sealed for OpenContext {}
+
 impl Context for OpenContext {
     fn get_handle(&self) -> *mut c_void
     {
@@ -167,7 +172,13 @@ impl Context for OpenContext {
 
 impl ContextWithPadding for OpenContext {}
 impl ContextWithRc2Supported for OpenContext {}
-impl ContextWithXcmDecryptProperties for OpenContext {}
+impl ContextWithXcmDecryptProperties for OpenContext {
+    fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>
+    {
+        open_set_input_length(self, input_len)?;
+        crypto::context_set_property_multiple(self, types::Property::CcmAad, ccm_aad)
+    }
+}
 
 impl OpenContext {
     /// Initializes an decryption context.
@@ -176,11 +187,6 @@ impl OpenContext {
                       iv: Option<&Key>) -> Result<OpenContext>
     {
         open_initialize(prv_key, algo, bcm, sym_key_length, sym_key, iv)
-    }
-    /// Sets the total length of the input. This is only used for CCM_AAD.
-    pub fn set_input_length(&self, input_len: usize) -> Result<()>
-    {
-        open_set_input_length(self, input_len)
     }
     /// Decrypts chunk of the data.
     pub fn update(&self, plaintext: &[u8]) -> Result<Vec<u8>>
@@ -194,10 +200,10 @@ impl OpenContext {
     }
 }
 
-/// Initializes an encryption context.
-pub fn open_initialize(prv_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
-                       sym_key_length: &KeyLength, sym_key: &Key,
-                       iv: Option<&Key>) -> Result<OpenContext>
+#[inline]
+fn open_initialize(prv_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
+                   sym_key_length: &KeyLength, sym_key: &Key,
+                   iv: Option<&Key>) -> Result<OpenContext>
 {
     let prv_key = key::get_handle(&prv_key);
     let algo = conv::encrypt_rs_to_c(algo);
@@ -218,8 +224,8 @@ pub fn open_initialize(prv_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipher
     Ok(OpenContext{handle})
 }
 
-/// Sets the total length of the input. This is only used for CCM_AAD.
-pub fn open_set_input_length(ctx: &OpenContext, input_len: usize) -> Result<()>
+#[inline]
+fn open_set_input_length(ctx: &OpenContext, input_len: usize) -> Result<()>
 {
     let ctx = ctx.get_handle();
     let ciphertext = ptr::null() as *const c_char;
@@ -233,8 +239,8 @@ pub fn open_set_input_length(ctx: &OpenContext, input_len: usize) -> Result<()>
     Ok(())
 }
 
-/// Encrypts chunk of the data.
-pub fn open_update(ctx: &OpenContext, ciphertext: &[u8]) -> Result<Vec<u8>>
+#[inline]
+fn open_update(ctx: &OpenContext, ciphertext: &[u8]) -> Result<Vec<u8>>
 {
     let ciphertext_len = ciphertext.len();
     let output_len = ctx.get_output_length(ciphertext_len)?;
@@ -257,8 +263,8 @@ pub fn open_update(ctx: &OpenContext, ciphertext: &[u8]) -> Result<Vec<u8>>
     Ok(plaintext_vec)
 }
 
-/// Encrypts the final chunk of the data.
-pub fn open_finalize(ctx: &OpenContext) -> Result<Vec<u8>>
+#[inline]
+fn open_finalize(ctx: &OpenContext) -> Result<Vec<u8>>
 {
     let output_len = ctx.get_output_length(0)?;
     let ctx = ctx.handle;

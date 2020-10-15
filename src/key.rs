@@ -21,8 +21,8 @@ impl std::fmt::Debug for Key {
             KeyType::Symmetric | KeyType::Des | KeyType::Iv => KeyFileFormat::Base64,
             _ => KeyFileFormat::Pem,
         };
-        let v = crate::key::key_export(self, &KeyFormat::Default,
-                                       &kff, None).unwrap();
+        let v = key::key_export(self, &KeyFormat::Default,
+                                &kff, None).unwrap();
         let s = CString::new(v).unwrap().into_string().unwrap();
         writeln!(f, "{:?} {:?}:", self.get_type().unwrap(), self.get_length().unwrap())?;
         write!(f, "{}", s)
@@ -110,21 +110,21 @@ impl Key {
     }
 }
 
-// Library private
+// Not exported outside of the crate
 pub fn get_handle(key: &Key) -> *const c_void
 {
     key.handle
 }
 
-// Library private
+// Not exported outside of the crate
 pub fn new_key(handle: *const c_void) -> Key
 {
     Key{handle}
 }
 
 
-/// Gets key's type.
-pub fn key_get_type(key: &Key) -> Result<KeyType>
+#[inline]
+fn key_get_type(key: &Key) -> Result<KeyType>
 {
     let mut kt: c_int = -1;
     let r = unsafe {
@@ -134,8 +134,8 @@ pub fn key_get_type(key: &Key) -> Result<KeyType>
     Ok(conv::key_type_c_to_rs(kt))
 }
 
-/// Gets key's length.
-pub fn key_get_length(key: &Key) -> Result<KeyLength>
+#[inline]
+fn key_get_length(key: &Key) -> Result<KeyLength>
 {
     let mut kl: size_t = 0;
     let r = unsafe {
@@ -145,8 +145,8 @@ pub fn key_get_length(key: &Key) -> Result<KeyLength>
     Ok(conv::key_length_c_to_rs(kl))
 }
 
-/// Imports a key or key generation parameters.
-pub fn key_import(data: &[u8], key_type: &KeyType, password: Option<&CStr>) -> Result<Key>
+#[inline]
+fn key_import(data: &[u8], key_type: &KeyType, password: Option<&CStr>) -> Result<Key>
 {
     let key_type = conv::key_type_rs_to_c(key_type);
     let password = match password {
@@ -165,9 +165,9 @@ pub fn key_import(data: &[u8], key_type: &KeyType, password: Option<&CStr>) -> R
     Ok(Key{handle})
 }
 
-/// Exports a key or key generation parameters to arbitrary format.
-pub fn key_export(key: &Key, key_fmt: &KeyFormat, key_file_fmt: &KeyFileFormat,
-                  password: Option<&CStr>) -> Result<Vec<u8>>
+#[inline]
+fn key_export(key: &Key, key_fmt: &KeyFormat, key_file_fmt: &KeyFileFormat,
+              password: Option<&CStr>) -> Result<Vec<u8>>
 {
     let key_fmt = conv::key_format_rs_to_c(key_fmt);
     let key_file_fmt = conv::key_file_format_rs_to_c(key_file_fmt);
@@ -193,9 +193,8 @@ pub fn key_export(key: &Key, key_fmt: &KeyFormat, key_file_fmt: &KeyFileFormat,
     Ok(v)
 }
 
-/// Generates a secure key or key generation parameters
-/// (or an Initialization Vector).
-pub fn key_generate(key_type: &KeyType, key_length: &KeyLength) -> Result<Key>
+#[inline]
+fn key_generate(key_type: &KeyType, key_length: &KeyLength) -> Result<Key>
 {
     let key_type = conv::key_type_rs_to_c(key_type);
     let key_bit_len = conv::key_length_rs_to_c(key_length);
@@ -208,8 +207,8 @@ pub fn key_generate(key_type: &KeyType, key_length: &KeyLength) -> Result<Key>
     Ok(Key{handle})
 }
 
-/// Generates a secure private asymmetric key from parameters.
-pub fn key_generate_from_parameters(params: &Key) -> Result<Key>
+#[inline]
+fn key_generate_from_parameters(params: &Key) -> Result<Key>
 {
     let params = params.handle;
     let mut handle: *const c_void = ptr::null();
@@ -221,8 +220,8 @@ pub fn key_generate_from_parameters(params: &Key) -> Result<Key>
     Ok(Key{handle})
 }
 
-/// Extracts public key from a private one.
-pub fn key_extract_public(prv_key: &Key) -> Result<Key>
+#[inline]
+fn key_extract_public(prv_key: &Key) -> Result<Key>
 {
     let prv_key = prv_key.handle;
     let mut handle: *const c_void = ptr::null();
@@ -234,8 +233,8 @@ pub fn key_extract_public(prv_key: &Key) -> Result<Key>
     Ok(Key{handle})
 }
 
-/// Extracts parameters from a private or a public key.
-pub fn key_extract_parameters(key: &Key) -> Result<Key>
+#[inline]
+fn key_extract_parameters(key: &Key) -> Result<Key>
 {
     let key = key.handle;
     let mut handle: *const c_void = ptr::null();
@@ -247,9 +246,8 @@ pub fn key_extract_parameters(key: &Key) -> Result<Key>
     Ok(Key{handle})
 }
 
-/// Derives a shared secret using Diffie-Helmann or EC Diffie-Helmann
-/// key exchange protocol.
-pub fn key_derive_dh(prv_key: &Key, pub_key: &Key) -> Result<Vec<u8>>
+#[inline]
+fn key_derive_dh(prv_key: &Key, pub_key: &Key) -> Result<Vec<u8>>
 {
     let prv_key = prv_key.handle;
     let pub_key = pub_key.handle;
@@ -270,10 +268,10 @@ pub fn key_derive_dh(prv_key: &Key, pub_key: &Key) -> Result<Vec<u8>>
     Ok(v)
 }
 
-/// Derives a key material from shared secret.
-pub fn key_derive_kdf(kdf: &Kdf, algo: &DigestAlgorithm,
-                      secret: &[u8], info: Option<&[u8]>,
-                      key_material_len: usize) -> Result<Vec<u8>>
+#[inline]
+fn key_derive_kdf(kdf: &Kdf, algo: &DigestAlgorithm,
+                  secret: &[u8], info: Option<&[u8]>,
+                  key_material_len: usize) -> Result<Vec<u8>>
 {
     let kdf = conv::kdf_rs_to_c(kdf);
     let algo = conv::digest_rs_to_c(algo);
@@ -309,9 +307,9 @@ pub fn key_derive_kdf(kdf: &Kdf, algo: &DigestAlgorithm,
     Ok(v)
 }
 
-/// Derives a key from user password (PKCS #5 a.k.a. pbkdf2 algorithm).
-pub fn key_derive_pbkdf2(password: &CStr, salt: Option<&[u8]>, iterations: usize,
-                         algo: &DigestAlgorithm, key_bit_len: usize) -> Result<Key>
+#[inline]
+fn key_derive_pbkdf2(password: &CStr, salt: Option<&[u8]>, iterations: usize,
+                     algo: &DigestAlgorithm, key_bit_len: usize) -> Result<Key>
 {
     let password = password.as_ptr();
     let salt_len: size_t;

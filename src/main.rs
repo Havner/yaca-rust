@@ -1,7 +1,7 @@
 use std::ffi::CString;
-use yaca::{self, Key, KeyType, KeyLength, KeyFormat, KeyFileFormat, Private, EncryptAlgorithm, BlockCipherMode, EncryptContext, DecryptContext};
-
-use yaca::{prelude::*, Padding};
+use yaca::{self, prelude::*};
+use yaca::{Key, KeyType, KeyLength, KeyFormat, KeyFileFormat, Private,
+           EncryptContext, DecryptContext, EncryptAlgorithm, BlockCipherMode, Padding};
 
 
 pub const MSG: &[u8] = b"Lorem ipsum dolor sit amet, consectetuer

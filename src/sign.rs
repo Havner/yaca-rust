@@ -21,6 +21,8 @@ impl Drop for SignContext {
     }
 }
 
+impl crypto::Sealed for SignContext {}
+
 impl Context for SignContext {
     fn get_handle(&self) -> *mut c_void
     {
@@ -58,8 +60,8 @@ impl SignContext {
     }
 }
 
-/// Initializes a signature context for asymmetric signatures.
-pub fn sign_initialize(algo: &DigestAlgorithm, prv_key: &Key) -> Result<SignContext>
+#[inline]
+fn sign_initialize(algo: &DigestAlgorithm, prv_key: &Key) -> Result<SignContext>
 {
     let algo = conv::digest_rs_to_c(algo);
     let prv_key = key::get_handle(prv_key);
@@ -72,8 +74,8 @@ pub fn sign_initialize(algo: &DigestAlgorithm, prv_key: &Key) -> Result<SignCont
     Ok(SignContext{handle})
 }
 
-/// Initializes a signature context for HMAC.
-pub fn sign_initialize_hmac(algo: &DigestAlgorithm, sym_key: &Key) -> Result<SignContext>
+#[inline]
+fn sign_initialize_hmac(algo: &DigestAlgorithm, sym_key: &Key) -> Result<SignContext>
 {
     let algo = conv::digest_rs_to_c(algo);
     let sym_key = key::get_handle(sym_key);
@@ -86,8 +88,8 @@ pub fn sign_initialize_hmac(algo: &DigestAlgorithm, sym_key: &Key) -> Result<Sig
     Ok(SignContext{handle})
 }
 
-/// Initializes a signature context for CMAC.
-pub fn sign_initialize_cmac(algo: &EncryptAlgorithm, sym_key: &Key) -> Result<SignContext>
+#[inline]
+fn sign_initialize_cmac(algo: &EncryptAlgorithm, sym_key: &Key) -> Result<SignContext>
 {
     let algo = conv::encrypt_rs_to_c(algo);
     let sym_key = key::get_handle(sym_key);
@@ -100,8 +102,8 @@ pub fn sign_initialize_cmac(algo: &EncryptAlgorithm, sym_key: &Key) -> Result<Si
     Ok(SignContext{handle})
 }
 
-/// Feeds the message into the digital signature or MAC algorithm.
-pub fn sign_update(ctx: &SignContext, message: &[u8]) -> Result<()>
+#[inline]
+fn sign_update(ctx: &SignContext, message: &[u8]) -> Result<()>
 {
     let message_len: size_t = message.len();
     let message = message.as_ptr() as *const c_char;
@@ -111,8 +113,8 @@ pub fn sign_update(ctx: &SignContext, message: &[u8]) -> Result<()>
     conv::res_c_to_rs(r)
 }
 
-/// Calculates the final signature or MAC.
-pub fn sign_finalize(ctx: &SignContext) -> Result<Vec<u8>>
+#[inline]
+fn sign_finalize(ctx: &SignContext) -> Result<Vec<u8>>
 {
     let output_len = ctx.get_output_length(0)?;
     assert!(output_len > 0);
@@ -145,6 +147,8 @@ impl Drop for VerifyContext {
     }
 }
 
+impl crypto::Sealed for VerifyContext {}
+
 impl Context for VerifyContext {
     fn get_handle(&self) -> *mut c_void
     {
@@ -172,8 +176,8 @@ impl VerifyContext {
     }
 }
 
-/// Initializes a signature verification context for asymmetric signatures.
-pub fn verify_initialize(algo: &DigestAlgorithm, pub_key: &Key) -> Result<VerifyContext>
+#[inline]
+fn verify_initialize(algo: &DigestAlgorithm, pub_key: &Key) -> Result<VerifyContext>
 {
     let algo = conv::digest_rs_to_c(algo);
     let pub_key = key::get_handle(pub_key);
@@ -186,8 +190,8 @@ pub fn verify_initialize(algo: &DigestAlgorithm, pub_key: &Key) -> Result<Verify
     Ok(VerifyContext{handle})
 }
 
-/// Feeds the message into the digital signature verification algorithm.
-pub fn verify_update(ctx: &VerifyContext, message: &[u8]) -> Result<()>
+#[inline]
+fn verify_update(ctx: &VerifyContext, message: &[u8]) -> Result<()>
 {
     let message_len: size_t = message.len();
     let message = message.as_ptr() as *const c_char;
@@ -197,8 +201,8 @@ pub fn verify_update(ctx: &VerifyContext, message: &[u8]) -> Result<()>
     conv::res_c_to_rs(r)
 }
 
-/// Performs the verification.
-pub fn verify_finalize(ctx: &VerifyContext, signature: &[u8]) -> Result<bool>
+#[inline]
+fn verify_finalize(ctx: &VerifyContext, signature: &[u8]) -> Result<bool>
 {
     let signature_len: size_t = signature.len();
     let signature = signature.as_ptr() as *const c_char;

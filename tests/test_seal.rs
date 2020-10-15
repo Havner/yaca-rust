@@ -122,8 +122,7 @@ fn encrypt_ccm_property()
                                                       &BlockCipherMode::Ccm,
                                                       &KeyLength::Bits(256)).unwrap();
     ctx.set_property_ccm_tag_len(tag_len).unwrap();
-    ctx.set_input_length(common::MSG.len()).unwrap();
-    ctx.set_property_ccm_aad(&aad).unwrap();
+    ctx.set_property_ccm_aad(&aad, common::MSG.len()).unwrap();
 
     let mut sealed: Vec<u8> = Vec::new();
     sealed.append(&mut ctx.update(common::MSG).unwrap());
@@ -135,8 +134,7 @@ fn encrypt_ccm_property()
                                       &BlockCipherMode::Ccm, &KeyLength::Bits(256),
                                       &key_seal, iv.as_ref()).unwrap();
     ctx.set_property_ccm_tag(&tag).unwrap();
-    ctx.set_input_length(sealed.len()).unwrap();
-    ctx.set_property_ccm_aad(&aad).unwrap();
+    ctx.set_property_ccm_aad(&aad, sealed.len()).unwrap();
 
     let mut opened: Vec<u8> = Vec::new();
     opened.append(&mut ctx.update(&sealed).unwrap());

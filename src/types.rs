@@ -126,7 +126,7 @@ pub enum BlockCipherMode {
 	Wrap,
 }
 
-// Library private
+// Not exported outside of the crate, used by Context property functions
 #[derive(Debug, PartialEq)]
 pub enum Property {
 	Padding,

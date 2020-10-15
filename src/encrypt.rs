@@ -23,6 +23,8 @@ impl Drop for EncryptContext {
     }
 }
 
+impl crypto::Sealed for EncryptContext {}
+
 impl Context for EncryptContext {
     fn get_handle(&self) -> *mut c_void
     {
@@ -32,7 +34,13 @@ impl Context for EncryptContext {
 
 impl ContextWithPadding for EncryptContext {}
 impl ContextWithRc2Supported for EncryptContext {}
-impl ContextWithXcmEncryptProperties for EncryptContext {}
+impl ContextWithXcmEncryptProperties for EncryptContext {
+    fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>
+    {
+        encrypt_set_input_length(self, input_len)?;
+        crypto::context_set_property_multiple(self, types::Property::CcmAad, ccm_aad)
+    }
+}
 
 impl EncryptContext {
     /// Returns the recommended/default length of the Initialization Vector
@@ -48,13 +56,6 @@ impl EncryptContext {
     {
         encrypt_initialize(algo, bcm, sym_key, iv)
     }
-    /// Sets the total length of the input. This is only used for CCM_AAD.
-    /// TODO: Consider dropping the flat API. Then all 4 "set_input_length" methods
-    /// can be merged with "set_property_ccm_add(aad, input_len)"
-    pub fn set_input_length(&self, input_len: usize) -> Result<()>
-    {
-        encrypt_set_input_length(self, input_len)
-    }
     /// Encrypts chunk of the data.
     pub fn update(&self, plaintext: &[u8]) -> Result<Vec<u8>>
     {
@@ -67,10 +68,9 @@ impl EncryptContext {
     }
 }
 
-/// Returns the recommended/default length of the Initialization Vector
-/// for a given encryption configuration.
-pub fn encrypt_get_iv_length(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
-                             key_length: &KeyLength) -> Result<Option<KeyLength>>
+#[inline]
+fn encrypt_get_iv_length(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
+                         key_length: &KeyLength) -> Result<Option<KeyLength>>
 {
     let algo = conv::encrypt_rs_to_c(algo);
     let bcm = conv::bcm_rs_to_c(bcm);
@@ -87,9 +87,9 @@ pub fn encrypt_get_iv_length(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
     }
 }
 
-/// Initializes an encryption context.
-pub fn encrypt_initialize(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
-                          sym_key: &Key, iv: Option<&Key>) -> Result<EncryptContext>
+#[inline]
+fn encrypt_initialize(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
+                      sym_key: &Key, iv: Option<&Key>) -> Result<EncryptContext>
 {
     let algo = conv::encrypt_rs_to_c(algo);
     let bcm = conv::bcm_rs_to_c(bcm);
@@ -107,8 +107,8 @@ pub fn encrypt_initialize(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
     Ok(EncryptContext{handle})
 }
 
-/// Sets the total length of the input. This is only used for CCM_AAD.
-pub fn encrypt_set_input_length(ctx: &EncryptContext, input_len: usize) -> Result<()>
+#[inline]
+fn encrypt_set_input_length(ctx: &EncryptContext, input_len: usize) -> Result<()>
 {
     let ctx = ctx.get_handle();
     let plaintext = ptr::null() as *const c_char;
@@ -122,8 +122,8 @@ pub fn encrypt_set_input_length(ctx: &EncryptContext, input_len: usize) -> Resul
     Ok(())
 }
 
-/// Encrypts chunk of the data.
-pub fn encrypt_update(ctx: &EncryptContext, plaintext: &[u8]) -> Result<Vec<u8>>
+#[inline]
+fn encrypt_update(ctx: &EncryptContext, plaintext: &[u8]) -> Result<Vec<u8>>
 {
     let plaintext_len = plaintext.len();
     let output_len = ctx.get_output_length(plaintext_len)?;
@@ -146,8 +146,8 @@ pub fn encrypt_update(ctx: &EncryptContext, plaintext: &[u8]) -> Result<Vec<u8>>
     Ok(ciphertext_vec)
 }
 
-/// Encrypts the final chunk of the data.
-pub fn encrypt_finalize(ctx: &EncryptContext) -> Result<Vec<u8>>
+#[inline]
+fn encrypt_finalize(ctx: &EncryptContext) -> Result<Vec<u8>>
 {
     let output_len = ctx.get_output_length(0)?;
     let ctx = ctx.handle;
@@ -179,6 +179,8 @@ impl Drop for DecryptContext {
     }
 }
 
+impl crypto::Sealed for DecryptContext {}
+
 impl Context for DecryptContext {
     fn get_handle(&self) -> *mut c_void
     {
@@ -188,7 +190,13 @@ impl Context for DecryptContext {
 
 impl ContextWithPadding for DecryptContext {}
 impl ContextWithRc2Supported for DecryptContext {}
-impl ContextWithXcmDecryptProperties for DecryptContext {}
+impl ContextWithXcmDecryptProperties for DecryptContext {
+    fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>
+    {
+        decrypt_set_input_length(self, input_len)?;
+        crypto::context_set_property_multiple(self, types::Property::CcmAad, ccm_aad)
+    }
+}
 
 impl DecryptContext {
     /// Initializes an decryption context.
@@ -196,11 +204,6 @@ impl DecryptContext {
                       sym_key: &Key, iv: Option<&Key>) -> Result<DecryptContext>
     {
         decrypt_initialize(algo, bcm, sym_key, iv)
-    }
-    /// Sets the total length of the input. This is only used for CCM_AAD.
-    pub fn set_input_length(&self, input_len: usize) -> Result<()>
-    {
-        decrypt_set_input_length(self, input_len)
     }
     /// Decrypts chunk of the data.
     pub fn update(&self, plaintext: &[u8]) -> Result<Vec<u8>>
@@ -214,8 +217,8 @@ impl DecryptContext {
     }
 }
 
-/// Initializes an encryption context.
-pub fn decrypt_initialize(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
+#[inline]
+fn decrypt_initialize(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
                           sym_key: &Key, iv: Option<&Key>) -> Result<DecryptContext>
 {
     let algo = conv::encrypt_rs_to_c(algo);
@@ -234,8 +237,8 @@ pub fn decrypt_initialize(algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
     Ok(DecryptContext{handle})
 }
 
-/// Sets the total length of the input. This is only used for CCM_AAD.
-pub fn decrypt_set_input_length(ctx: &DecryptContext, input_len: usize) -> Result<()>
+#[inline]
+fn decrypt_set_input_length(ctx: &DecryptContext, input_len: usize) -> Result<()>
 {
     let ctx = ctx.get_handle();
     let ciphertext = ptr::null() as *const c_char;
@@ -249,8 +252,8 @@ pub fn decrypt_set_input_length(ctx: &DecryptContext, input_len: usize) -> Resul
     Ok(())
 }
 
-/// Encrypts chunk of the data.
-pub fn decrypt_update(ctx: &DecryptContext, ciphertext: &[u8]) -> Result<Vec<u8>>
+#[inline]
+fn decrypt_update(ctx: &DecryptContext, ciphertext: &[u8]) -> Result<Vec<u8>>
 {
     let ciphertext_len = ciphertext.len();
     let output_len = ctx.get_output_length(ciphertext_len)?;
@@ -273,8 +276,8 @@ pub fn decrypt_update(ctx: &DecryptContext, ciphertext: &[u8]) -> Result<Vec<u8>
     Ok(plaintext_vec)
 }
 
-/// Encrypts the final chunk of the data.
-pub fn decrypt_finalize(ctx: &DecryptContext) -> Result<Vec<u8>>
+#[inline]
+fn decrypt_finalize(ctx: &DecryptContext) -> Result<Vec<u8>>
 {
     let output_len = ctx.get_output_length(0)?;
     let ctx = ctx.handle;
