@@ -17,10 +17,9 @@ fn encrypt_basic()
                                                &BlockCipherMode::Cbc,
                                                &KeyLength::Bits(256)).unwrap();
 
-    if let Some(KeyLength::Bits(iv_bit_len)) = len_iv {
-        assert_eq!(iv_bit_len, 128);
-    } else {
-        panic!("Wrong IV bit length");
+    match len_iv {
+        Some(KeyLength::Bits(iv_bit_len)) => assert_eq!(iv_bit_len, 128),
+        _ => panic!("IV bit length was expected, wrong or None returned"),
     }
 
     let ctx = EncryptContext::initialize(&EncryptAlgorithm::Aes, &BlockCipherMode::Cbc,

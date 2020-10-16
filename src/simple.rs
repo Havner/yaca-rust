@@ -1,7 +1,7 @@
-use libc::{size_t, c_void, c_char};
+use libc::c_char;
 use std::ptr;
-use std::slice;
 
+use crate::yaca_common as common;
 use crate::yaca_lib as lib;
 use crate::yaca_conv as conv;
 use crate::*;
@@ -18,13 +18,13 @@ pub fn simple_encrypt(algo: &EncryptAlgorithm, bcm: &BlockCipherMode, sym_key: &
         Some(i) => key::get_handle(&i),
         None => ptr::null(),
     };
-    let plaintext_len: size_t = plaintext.len();
+    let plaintext_len = plaintext.len();
     let plaintext = match plaintext_len {
         0 => ptr::null(),
         _ => plaintext.as_ptr() as *const c_char,
     };
-    let mut ciphertext: *const c_char = ptr::null();
-    let mut ciphertext_len: size_t = 0;
+    let mut ciphertext = ptr::null();
+    let mut ciphertext_len = 0;
     let r = unsafe {
         lib::yaca_simple_encrypt(algo, bcm, sym_key, iv, plaintext, plaintext_len,
                                  &mut ciphertext, &mut ciphertext_len)
@@ -36,13 +36,7 @@ pub fn simple_encrypt(algo: &EncryptAlgorithm, bcm: &BlockCipherMode, sym_key: &
             Ok(Vec::<u8>::new())
         },
         false => {
-            assert!(ciphertext_len > 0);
-            let v;
-            unsafe {
-                v = slice::from_raw_parts(ciphertext as *const u8,
-                                          ciphertext_len as usize).to_vec();
-                lib::yaca_free(ciphertext as *mut c_void);
-            };
+            let v = common::vector_from_raw(ciphertext_len, ciphertext);
             Ok(v)
         },
     }
@@ -59,13 +53,13 @@ pub fn simple_decrypt(algo: &EncryptAlgorithm, bcm: &BlockCipherMode, sym_key: &
         Some(i) => key::get_handle(&i),
         None => ptr::null(),
     };
-    let ciphertext_len: size_t = ciphertext.len();
+    let ciphertext_len = ciphertext.len();
     let ciphertext = match ciphertext_len {
         0 => ptr::null(),
         _ => ciphertext.as_ptr() as *const c_char,
     };
-    let mut plaintext: *const c_char = ptr::null();
-    let mut plaintext_len: size_t = 0;
+    let mut plaintext = ptr::null();
+    let mut plaintext_len = 0;
     let r = unsafe {
         lib::yaca_simple_decrypt(algo, bcm, sym_key, iv, ciphertext, ciphertext_len,
                                  &mut plaintext, &mut plaintext_len)
@@ -77,13 +71,7 @@ pub fn simple_decrypt(algo: &EncryptAlgorithm, bcm: &BlockCipherMode, sym_key: &
             Ok(Vec::<u8>::new())
         },
         false => {
-            assert!(plaintext_len > 0);
-            let v;
-            unsafe {
-                v = slice::from_raw_parts(plaintext as *const u8,
-                                          plaintext_len as usize).to_vec();
-                lib::yaca_free(plaintext as *mut c_void);
-            };
+            let v = common::vector_from_raw(plaintext_len, plaintext);
             Ok(v)
         },
     }
@@ -93,20 +81,16 @@ pub fn simple_decrypt(algo: &EncryptAlgorithm, bcm: &BlockCipherMode, sym_key: &
 pub fn simple_calculate_digest(algo: &DigestAlgorithm, message: &[u8]) -> Result<Vec<u8>>
 {
     let algo = conv::digest_rs_to_c(algo);
-    let message_len: size_t = message.len();
+    let message_len = message.len();
     let message = message.as_ptr() as *const c_char;
-    let mut digest: *const c_char = ptr::null();
-    let mut digest_len: size_t = 0;
+    let mut digest = ptr::null();
+    let mut digest_len = 0;
     let r = unsafe {
         lib::yaca_simple_calculate_digest(algo, message, message_len,
                                           &mut digest, &mut digest_len)
     };
     conv::res_c_to_rs(r)?;
-    let v;
-    unsafe {
-        v = slice::from_raw_parts(digest as *const u8, digest_len as usize).to_vec();
-        lib::yaca_free(digest as *mut c_void);
-    }
+    let v = common::vector_from_raw(digest_len, digest);
     Ok(v)
 }
 
@@ -116,20 +100,16 @@ pub fn simple_calculate_signature(algo: &DigestAlgorithm, prv_key: &Key,
 {
     let algo = conv::digest_rs_to_c(algo);
     let prv_key = key::get_handle(&prv_key);
-    let message_len: size_t = message.len();
+    let message_len = message.len();
     let message = message.as_ptr() as *const c_char;
-    let mut signature: *const c_char = ptr::null();
-    let mut signature_len: size_t = 0;
+    let mut signature = ptr::null();
+    let mut signature_len = 0;
     let r = unsafe {
         lib::yaca_simple_calculate_signature(algo, prv_key, message, message_len,
                                              &mut signature, &mut signature_len)
     };
     conv::res_c_to_rs(r)?;
-    let v;
-    unsafe {
-        v = slice::from_raw_parts(signature as *const u8, signature_len as usize).to_vec();
-        lib::yaca_free(signature as *mut c_void);
-    }
+    let v = common::vector_from_raw(signature_len, signature);
     Ok(v)
 }
 
@@ -139,9 +119,9 @@ pub fn simple_verify_signature(algo: &DigestAlgorithm, pub_key: &Key,
 {
     let algo = conv::digest_rs_to_c(algo);
     let pub_key = key::get_handle(&pub_key);
-    let message_len: size_t = message.len();
+    let message_len = message.len();
     let message = message.as_ptr() as *const c_char;
-    let signature_len: size_t = signature.len();
+    let signature_len = signature.len();
     let signature = signature.as_ptr() as *const c_char;
     let r = unsafe {
         lib::yaca_simple_verify_signature(algo, pub_key, message, message_len,
@@ -156,20 +136,16 @@ pub fn simple_calculate_hmac(algo: &DigestAlgorithm, sym_key: &Key,
 {
     let algo = conv::digest_rs_to_c(algo);
     let sym_key = key::get_handle(&sym_key);
-    let message_len: size_t = message.len();
+    let message_len = message.len();
     let message = message.as_ptr() as *const c_char;
-    let mut mac: *const c_char = ptr::null();
-    let mut mac_len: size_t = 0;
+    let mut mac = ptr::null();
+    let mut mac_len = 0;
     let r = unsafe {
         lib::yaca_simple_calculate_hmac(algo, sym_key, message, message_len,
                                         &mut mac, &mut mac_len)
     };
     conv::res_c_to_rs(r)?;
-    let v;
-    unsafe {
-        v = slice::from_raw_parts(mac as *const u8, mac_len as usize).to_vec();
-        lib::yaca_free(mac as *mut c_void);
-    };
+    let v = common::vector_from_raw(mac_len, mac);
     Ok(v)
 }
 
@@ -179,19 +155,15 @@ pub fn simple_calculate_cmac(algo: &EncryptAlgorithm, sym_key: &Key,
 {
     let algo = conv::encrypt_rs_to_c(algo);
     let sym_key = key::get_handle(&sym_key);
-    let message_len: size_t = message.len();
+    let message_len = message.len();
     let message = message.as_ptr() as *const c_char;
-    let mut mac: *const c_char = ptr::null();
-    let mut mac_len: size_t = 0;
+    let mut mac = ptr::null();
+    let mut mac_len = 0;
     let r = unsafe {
         lib::yaca_simple_calculate_cmac(algo, sym_key, message, message_len,
                                         &mut mac, &mut mac_len)
     };
     conv::res_c_to_rs(r)?;
-    let v;
-    unsafe {
-        v = slice::from_raw_parts(mac as *const u8, mac_len as usize).to_vec();
-        lib::yaca_free(mac as *mut c_void);
-    };
+    let v = common::vector_from_raw(mac_len, mac);
     Ok(v)
 }

@@ -1,8 +1,8 @@
-use libc::{c_char, size_t, c_void};
+use libc::{c_char, c_void};
 use std::mem;
 use std::ptr;
-use std::slice;
 
+use crate::yaca_common as common;
 use crate::yaca_lib as lib;
 use crate::yaca_conv as conv;
 use crate::*;
@@ -10,11 +10,8 @@ use crate::*;
 
 // TRAITS
 
-// Not exported outside of the crate, used to c-seal the Context trait
-pub trait Sealed {}
-
 /// Trait for different contexts
-pub trait Context: Sealed {
+pub trait Context {
     fn get_handle(&self) -> *mut c_void;
     fn get_output_length(&self, input_len: usize) -> Result<usize>
     {
@@ -51,7 +48,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     /// Sets the GCM tag length property.
     fn set_property_gcm_tag_len(&self, gcm_tag_len: usize) -> Result<()>
     {
-        context_set_property_single(self, types::Property::GcmTagLen, gcm_tag_len as size_t)
+        context_set_property_single(self, types::Property::GcmTagLen, gcm_tag_len)
     }
     /// Sets the CCM AAD property.
     fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>;
@@ -106,7 +103,9 @@ pub trait ContextWithXcmDecryptProperties: Context {
 /// function. Should be called once in each thread that uses yaca.
 pub fn initialize() -> Result<()>
 {
-    let r = unsafe { lib::yaca_initialize() };
+    let r = unsafe {
+        lib::yaca_initialize()
+    };
     conv::res_c_to_rs(r)
 }
 
@@ -114,7 +113,9 @@ pub fn initialize() -> Result<()>
 /// Must be called before exiting the thread that called yaca_initialize().
 pub fn cleanup()
 {
-    unsafe { lib::yaca_cleanup(); };
+    unsafe {
+        lib::yaca_cleanup()
+    }
 }
 
 /// Safely compares first length bytes of two buffers.
@@ -124,9 +125,8 @@ pub fn memcmp(first: &[u8], second: &[u8], length: usize) -> Result<bool>
     assert!(length <= min);
     let first = first.as_ptr() as *const c_void;
     let second = second.as_ptr() as *const c_void;
-    let len: size_t = length;
     let r = unsafe {
-        lib::yaca_memcmp(first, second, len)
+        lib::yaca_memcmp(first, second, length)
     };
     conv::res_c_to_rs_bool(r)
 }
@@ -136,14 +136,13 @@ pub fn random_bytes(length: usize) -> Result<Vec<u8>>
 {
     let mut v: Vec<u8> = Vec::with_capacity(length);
     let data = v.as_mut_ptr() as *mut c_char;
-    let data_len: size_t = length;
     let r = unsafe {
-        lib::yaca_randomize_bytes(data, data_len)
+        lib::yaca_randomize_bytes(data, length)
     };
     conv::res_c_to_rs(r)?;
     unsafe {
         v.set_len(length);
-    }
+    };
     Ok(v)
 }
 
@@ -153,29 +152,28 @@ fn context_set_property_single<T, U>(ctx: &T, prop: types::Property,
 {
     let ctx = ctx.get_handle();
     let property = conv::property_rs_to_c(&prop);
-    let value = (&value as *const U) as *const c_void;
-    let value_len: size_t = mem::size_of::<U>();
+    let value: *const U = &value;
+    let value = value as *const c_void;
+    let value_len = mem::size_of::<U>();
     let r = unsafe {
         lib::yaca_context_set_property(ctx, property, value, value_len)
     };
-    conv::res_c_to_rs(r)?;
-    Ok(())
+    conv::res_c_to_rs(r)
 }
 
-// Not exported outside of the crate, used by set_property_ccm_aad implementators
-pub fn context_set_property_multiple<T, U>(ctx: &T, prop: types::Property,
-                                       value: &[U]) -> Result<()>
+// Used by set_property_ccm_aad implementators
+pub(crate) fn context_set_property_multiple<T, U>(ctx: &T, prop: types::Property,
+                                           value: &[U]) -> Result<()>
     where T: Context + ?Sized,
 {
     let ctx = ctx.get_handle();
     let property = conv::property_rs_to_c(&prop);
-    let value_len: size_t = value.len() * mem::size_of::<U>();
+    let value_len = value.len() * mem::size_of::<U>();
     let value = value.as_ptr() as *const c_void;
     let r = unsafe {
         lib::yaca_context_set_property(ctx, property, value, value_len)
     };
-    conv::res_c_to_rs(r)?;
-    Ok(())
+    conv::res_c_to_rs(r)
 }
 
 fn context_get_property_multiple<T, U>(ctx: &T, prop: types::Property) -> Result<Vec<U>>
@@ -184,33 +182,25 @@ fn context_get_property_multiple<T, U>(ctx: &T, prop: types::Property) -> Result
 {
     let ctx = ctx.get_handle();
     let property = conv::property_rs_to_c(&prop);
-    let mut value: *const c_void = ptr::null();
-    let mut value_len: size_t = 0;
+    let mut value = ptr::null();
+    let mut value_len = 0;
     let r = unsafe {
         lib::yaca_context_get_property(ctx, property, &mut value, &mut value_len)
     };
     conv::res_c_to_rs(r)?;
-    assert!(!value.is_null());
-    assert!(value_len > 0);
-    let v;
     let value_len = value_len / mem::size_of::<U>();
-    unsafe {
-        v = slice::from_raw_parts(value as *const U,
-                                  value_len as usize).to_vec();
-        lib::yaca_free(value as *mut c_void);
-    }
+    let v = common::vector_from_raw(value_len, value);
     Ok(v)
 }
 
 fn context_get_output_length<T>(ctx: &T, input_len: usize) -> Result<usize>
     where T: Context + ?Sized,
 {
-    let input_len: size_t = input_len;
-    let mut output_len: size_t = 0;
+    let mut output_len = 0;
     let ctx = ctx.get_handle();
     let r = unsafe {
         lib::yaca_context_get_output_length(ctx, input_len, &mut output_len)
     };
     conv::res_c_to_rs(r)?;
-    Ok(output_len as usize)
+    Ok(output_len)
 }

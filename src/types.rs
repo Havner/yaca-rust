@@ -126,9 +126,9 @@ pub enum BlockCipherMode {
 	Wrap,
 }
 
-// Not exported outside of the crate, used by Context property functions
+// Used by Context property functions
 #[derive(Debug, PartialEq)]
-pub enum Property {
+pub(crate) enum Property {
 	Padding,
 	GcmAad,
 	GcmTag,

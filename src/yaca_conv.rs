@@ -11,7 +11,7 @@ const YACA_ERROR_INTERNAL:          c_int = BASE_ERROR_YACA | 0x01;
 const YACA_ERROR_DATA_MISMATCH:     c_int = BASE_ERROR_YACA | 0x02;
 const YACA_ERROR_INVALID_PASSWORD:  c_int = BASE_ERROR_YACA | 0x03;
 
-pub fn res_c_to_rs(r: c_int) -> crate::Result<()>
+pub(crate) fn res_c_to_rs(r: c_int) -> crate::Result<()>
 {
     match r {
         YACA_ERROR_NONE => Result::Ok(()),
@@ -24,7 +24,7 @@ pub fn res_c_to_rs(r: c_int) -> crate::Result<()>
     }
 }
 
-pub fn res_c_to_rs_bool(r: c_int) -> crate::Result<bool>
+pub(crate) fn res_c_to_rs_bool(r: c_int) -> crate::Result<bool>
 {
     match r {
         YACA_ERROR_NONE => Result::Ok(true),
@@ -53,7 +53,7 @@ const YACA_KEY_TYPE_DH_PARAMS:  c_int = 12;
 const YACA_KEY_TYPE_EC_PARAMS:  c_int = 13;
 
 
-pub fn key_type_rs_to_c(kt: &KeyType) -> c_int
+pub(crate) fn key_type_rs_to_c(kt: &KeyType) -> c_int
 {
     match kt {
         KeyType::Symmetric => YACA_KEY_TYPE_SYMMETRIC,
@@ -74,7 +74,7 @@ pub fn key_type_rs_to_c(kt: &KeyType) -> c_int
     }
 }
 
-pub fn key_type_c_to_rs(kt: c_int) -> KeyType
+pub(crate) fn key_type_c_to_rs(kt: c_int) -> KeyType
 {
     match kt {
         YACA_KEY_TYPE_SYMMETRIC => KeyType::Symmetric,
@@ -108,7 +108,7 @@ const YACA_KEY_LENGTH_DH_RFC_2048_256: c_int = 0x22000800;
 const YACA_KEY_LENGTH_DH_GENERATOR_2: c_int = 0x10000000;
 const YACA_KEY_LENGTH_DH_GENERATOR_5: c_int = 0x11000000;
 
-pub fn key_length_rs_to_c(kl: &KeyLength) -> size_t
+pub(crate) fn key_length_rs_to_c(kl: &KeyLength) -> size_t
 {
     match kl {
         KeyLength::Bits(bl) => *bl as size_t,
@@ -127,7 +127,7 @@ pub fn key_length_rs_to_c(kl: &KeyLength) -> size_t
     }
 }
 
-pub fn key_length_c_to_rs(kl: size_t) -> KeyLength
+pub(crate) fn key_length_c_to_rs(kl: size_t) -> KeyLength
 {
     const MAX_BITS: c_int = std::u16::MAX as c_int;
     match kl as c_int {
@@ -148,7 +148,7 @@ pub fn key_length_c_to_rs(kl: size_t) -> KeyLength
 const YACA_KEY_FORMAT_DEFAULT: c_int = 0;
 const YACA_KEY_FORMAT_PKCS8:   c_int = 1;
 
-pub fn key_format_rs_to_c(kf: &KeyFormat) -> c_int
+pub(crate) fn key_format_rs_to_c(kf: &KeyFormat) -> c_int
 {
     match kf {
         KeyFormat::Default => YACA_KEY_FORMAT_DEFAULT,
@@ -161,7 +161,7 @@ const YACA_KEY_FILE_FORMAT_BASE64: c_int = 1;
 const YACA_KEY_FILE_FORMAT_PEM:    c_int = 2;
 const YACA_KEY_FILE_FORMAT_DER:    c_int = 3;
 
-pub fn key_file_format_rs_to_c(kff: &KeyFileFormat) -> c_int
+pub(crate) fn key_file_format_rs_to_c(kff: &KeyFileFormat) -> c_int
 {
     match kff {
         KeyFileFormat::Raw => YACA_KEY_FILE_FORMAT_RAW,
@@ -178,7 +178,7 @@ const YACA_DIGEST_SHA256: c_int = 3;
 const YACA_DIGEST_SHA384: c_int = 4;
 const YACA_DIGEST_SHA512: c_int = 5;
 
-pub fn digest_rs_to_c(digest: &DigestAlgorithm) -> c_int
+pub(crate) fn digest_rs_to_c(digest: &DigestAlgorithm) -> c_int
 {
     match digest {
         DigestAlgorithm::Md5 => YACA_DIGEST_MD5,
@@ -198,7 +198,7 @@ const YACA_ENCRYPT_UNSAFE_RC2:        c_int = 4;
 const YACA_ENCRYPT_UNSAFE_RC4:        c_int = 5;
 const YACA_ENCRYPT_CAST5:             c_int = 6;
 
-pub fn encrypt_rs_to_c(encrypt: &EncryptAlgorithm) -> c_int
+pub(crate) fn encrypt_rs_to_c(encrypt: &EncryptAlgorithm) -> c_int
 {
     match encrypt {
         EncryptAlgorithm::Aes => YACA_ENCRYPT_AES,
@@ -223,7 +223,7 @@ const YACA_BCM_OFB:  c_int = 8;
 const YACA_BCM_CCM:  c_int = 9;
 const YACA_BCM_WRAP: c_int = 10;
 
-pub fn bcm_rs_to_c(bcm: &BlockCipherMode) -> c_int
+pub(crate) fn bcm_rs_to_c(bcm: &BlockCipherMode) -> c_int
 {
     match bcm {
         BlockCipherMode::None => YACA_BCM_NONE,
@@ -249,7 +249,7 @@ const YACA_PROPERTY_CCM_TAG:                c_int = 5;
 const YACA_PROPERTY_CCM_TAG_LEN:            c_int = 6;
 const YACA_PROPERTY_RC2_EFFECTIVE_KEY_BITS: c_int = 7;
 
-pub fn property_rs_to_c(prop: &types::Property) -> c_int
+pub(crate) fn property_rs_to_c(prop: &types::Property) -> c_int
 {
     match prop {
         types::Property::Padding => YACA_PROPERTY_PADDING,
@@ -271,7 +271,7 @@ const YACA_PADDING_PKCS1_OAEP:   c_int = 4;
 const YACA_PADDING_PKCS1_SSLV23: c_int = 5;
 const YACA_PADDING_PKCS7:        c_int = 6;
 
-pub fn padding_rs_to_c(pad: &Padding) -> c_int
+pub(crate) fn padding_rs_to_c(pad: &Padding) -> c_int
 {
     match pad {
         Padding::None => YACA_PADDING_NONE,
@@ -287,7 +287,7 @@ pub fn padding_rs_to_c(pad: &Padding) -> c_int
 const YACA_KDF_X942: c_int = 0;
 const YACA_KDF_X962: c_int = 1;
 
-pub fn kdf_rs_to_c(kdf: &Kdf) -> c_int
+pub(crate) fn kdf_rs_to_c(kdf: &Kdf) -> c_int
 {
     match kdf {
         Kdf::X942 => YACA_KDF_X942,

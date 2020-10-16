@@ -107,7 +107,7 @@ extern {
     // seal
     pub fn yaca_seal_initialize(ctx: *mut *mut c_void, pub_key: *const c_void,
                                 algo: c_int, bcm: c_int, sym_key_bit_len: size_t,
-                                sym_key: *mut *const c_void, iv_key: *mut *const c_void) -> c_int;
+                                sym_key: *mut *const c_void, iv: *mut *const c_void) -> c_int;
     pub fn yaca_seal_update(ctx: *mut c_void, plaintext: *const c_char,
                             plaintext_len: size_t, ciphertext: *mut c_char,
                             ciphertext_len: *mut size_t) -> c_int;

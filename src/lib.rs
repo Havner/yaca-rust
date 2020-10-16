@@ -2,6 +2,7 @@
 //!
 //! use yaca::{self, prelude::*}
 
+mod yaca_common;
 mod yaca_lib;
 mod yaca_conv;
 
@@ -23,7 +24,7 @@ pub mod prelude {
     pub use super::crypto::ContextWithXcmDecryptProperties;
 }
 
-// TODO: consider simplifying those pub use in the future
+// TODO: consider simplifying those "pub use" in the future
 
 pub type Result<T> = std::result::Result<T, Error>;
 

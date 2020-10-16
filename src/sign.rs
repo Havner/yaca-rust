@@ -1,4 +1,4 @@
-use libc::{size_t, c_void, c_char};
+use libc::{c_void, c_char};
 use std::ptr;
 
 use crate::yaca_lib as lib;
@@ -16,12 +16,10 @@ impl Drop for SignContext {
     fn drop(&mut self)
     {
         unsafe {
-            lib::yaca_context_destroy(self.handle);
-        };
+            lib::yaca_context_destroy(self.handle)
+        }
     }
 }
-
-impl crypto::Sealed for SignContext {}
 
 impl Context for SignContext {
     fn get_handle(&self) -> *mut c_void
@@ -65,7 +63,7 @@ fn sign_initialize(algo: &DigestAlgorithm, prv_key: &Key) -> Result<SignContext>
 {
     let algo = conv::digest_rs_to_c(algo);
     let prv_key = key::get_handle(prv_key);
-    let mut handle = ptr::null_mut() as *mut c_void;
+    let mut handle = ptr::null_mut();
     let r = unsafe {
         lib::yaca_sign_initialize(&mut handle, algo, prv_key)
     };
@@ -79,7 +77,7 @@ fn sign_initialize_hmac(algo: &DigestAlgorithm, sym_key: &Key) -> Result<SignCon
 {
     let algo = conv::digest_rs_to_c(algo);
     let sym_key = key::get_handle(sym_key);
-    let mut handle = ptr::null_mut() as *mut c_void;
+    let mut handle = ptr::null_mut();
     let r = unsafe {
         lib::yaca_sign_initialize_hmac(&mut handle, algo, sym_key)
     };
@@ -93,7 +91,7 @@ fn sign_initialize_cmac(algo: &EncryptAlgorithm, sym_key: &Key) -> Result<SignCo
 {
     let algo = conv::encrypt_rs_to_c(algo);
     let sym_key = key::get_handle(sym_key);
-    let mut handle = ptr::null_mut() as *mut c_void;
+    let mut handle = ptr::null_mut();
     let r = unsafe {
         lib::yaca_sign_initialize_cmac(&mut handle, algo, sym_key)
     };
@@ -105,7 +103,7 @@ fn sign_initialize_cmac(algo: &EncryptAlgorithm, sym_key: &Key) -> Result<SignCo
 #[inline]
 fn sign_update(ctx: &SignContext, message: &[u8]) -> Result<()>
 {
-    let message_len: size_t = message.len();
+    let message_len = message.len();
     let message = message.as_ptr() as *const c_char;
     let r = unsafe {
         lib::yaca_sign_update(ctx.handle, message, message_len)
@@ -120,14 +118,14 @@ fn sign_finalize(ctx: &SignContext) -> Result<Vec<u8>>
     assert!(output_len > 0);
     let mut digest_vec: Vec<u8> = Vec::with_capacity(output_len);
     let digest = digest_vec.as_mut_ptr() as *mut c_char;
-    let mut digest_len: size_t = output_len;
+    let mut digest_len = output_len;
     let r = unsafe {
         lib::yaca_sign_finalize(ctx.handle, digest, &mut digest_len)
     };
     conv::res_c_to_rs(r)?;
     assert!(digest_len <= output_len);
     unsafe {
-        digest_vec.set_len(digest_len as usize);
+        digest_vec.set_len(digest_len);
     };
     Ok(digest_vec)
 }
@@ -142,12 +140,10 @@ impl Drop for VerifyContext {
     fn drop(&mut self)
     {
         unsafe {
-            lib::yaca_context_destroy(self.handle);
-        };
+            lib::yaca_context_destroy(self.handle)
+        }
     }
 }
-
-impl crypto::Sealed for VerifyContext {}
 
 impl Context for VerifyContext {
     fn get_handle(&self) -> *mut c_void
@@ -181,7 +177,7 @@ fn verify_initialize(algo: &DigestAlgorithm, pub_key: &Key) -> Result<VerifyCont
 {
     let algo = conv::digest_rs_to_c(algo);
     let pub_key = key::get_handle(pub_key);
-    let mut handle = ptr::null_mut() as *mut c_void;
+    let mut handle = ptr::null_mut();
     let r = unsafe {
         lib::yaca_verify_initialize(&mut handle, algo, pub_key)
     };
@@ -193,7 +189,7 @@ fn verify_initialize(algo: &DigestAlgorithm, pub_key: &Key) -> Result<VerifyCont
 #[inline]
 fn verify_update(ctx: &VerifyContext, message: &[u8]) -> Result<()>
 {
-    let message_len: size_t = message.len();
+    let message_len = message.len();
     let message = message.as_ptr() as *const c_char;
     let r = unsafe {
         lib::yaca_verify_update(ctx.handle, message, message_len)
@@ -204,7 +200,7 @@ fn verify_update(ctx: &VerifyContext, message: &[u8]) -> Result<()>
 #[inline]
 fn verify_finalize(ctx: &VerifyContext, signature: &[u8]) -> Result<bool>
 {
-    let signature_len: size_t = signature.len();
+    let signature_len = signature.len();
     let signature = signature.as_ptr() as *const c_char;
     let r = unsafe {
         lib::yaca_verify_finalize(ctx.handle, signature, signature_len)

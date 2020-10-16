@@ -12,7 +12,7 @@ fn crypto()
     let vec2: Vec<u8> = common::MSG.into_iter().map(|c| c.to_ascii_uppercase()).collect();
     assert_eq!(memcmp(common::MSG, &vec2, common::MSG.len()).unwrap(), false);
 
-    let len: usize = 100;
+    let len = 100;
     let rand_bytes1 = random_bytes(len).unwrap();
     assert_eq!(rand_bytes1.len(), len);
     let rand_bytes2 = random_bytes(len).unwrap();

@@ -18,12 +18,10 @@ impl Drop for SealContext {
     fn drop(&mut self)
     {
         unsafe {
-            lib::yaca_context_destroy(self.handle);
-        };
+            lib::yaca_context_destroy(self.handle)
+        }
     }
 }
-
-impl crypto::Sealed for SealContext {}
 
 impl Context for SealContext {
     fn get_handle(&self) -> *mut c_void
@@ -69,9 +67,9 @@ fn seal_initialize(pub_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode
     let algo = conv::encrypt_rs_to_c(algo);
     let bcm = conv::bcm_rs_to_c(bcm);
     let sym_key_bit_length = conv::key_length_rs_to_c(sym_key_length);
-    let mut sym_key: *const c_void = ptr::null();
-    let mut iv: *const c_void = ptr::null();
-    let mut handle: *mut c_void = ptr::null_mut();
+    let mut sym_key = ptr::null();
+    let mut iv = ptr::null();
+    let mut handle = ptr::null_mut();
     let r = unsafe {
         lib::yaca_seal_initialize(&mut handle, pub_key, algo, bcm, sym_key_bit_length,
                                   &mut sym_key, &mut iv)
@@ -93,15 +91,14 @@ fn seal_initialize(pub_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode
 fn seal_set_input_length(ctx: &SealContext, input_len: usize) -> Result<()>
 {
     let ctx = ctx.get_handle();
-    let plaintext = ptr::null() as *const c_char;
-    let plaintext_len = input_len as size_t;
-    let ciphertext = ptr::null_mut() as *mut c_char;
-    let mut ciphertext_len: size_t = mem::size_of::<size_t>();
+    let plaintext = ptr::null();
+    let plaintext_len = input_len;
+    let ciphertext = ptr::null_mut();
+    let mut ciphertext_len = mem::size_of::<size_t>();
     let r = unsafe {
         lib::yaca_seal_update(ctx, plaintext, plaintext_len, ciphertext, &mut ciphertext_len)
     };
-    conv::res_c_to_rs(r)?;
-    Ok(())
+    conv::res_c_to_rs(r)
 }
 
 #[inline]
@@ -115,7 +112,7 @@ fn seal_update(ctx: &SealContext, plaintext: &[u8]) -> Result<Vec<u8>>
         _ => plaintext.as_ptr() as *const c_char,
     };
     let mut ciphertext_vec: Vec<u8> = Vec::with_capacity(output_len);
-    let mut ciphertext_len: size_t = 0;
+    let mut ciphertext_len = 0;
     let ciphertext = ciphertext_vec.as_mut_ptr() as *mut c_char;
     let r = unsafe {
         lib::yaca_seal_update(ctx, plaintext, plaintext_len, ciphertext, &mut ciphertext_len)
@@ -123,7 +120,7 @@ fn seal_update(ctx: &SealContext, plaintext: &[u8]) -> Result<Vec<u8>>
     conv::res_c_to_rs(r)?;
     assert!(ciphertext_len <= output_len);
     unsafe {
-        ciphertext_vec.set_len(ciphertext_len as usize);
+        ciphertext_vec.set_len(ciphertext_len);
     };
     Ok(ciphertext_vec)
 }
@@ -134,7 +131,7 @@ fn seal_finalize(ctx: &SealContext) -> Result<Vec<u8>>
     let output_len = ctx.get_output_length(0)?;
     let ctx = ctx.handle;
     let mut ciphertext_vec: Vec<u8> = Vec::with_capacity(output_len);
-    let mut ciphertext_len: size_t = 0;
+    let mut ciphertext_len = 0;
     let ciphertext = ciphertext_vec.as_mut_ptr() as *mut c_char;
     let r = unsafe {
         lib::yaca_seal_finalize(ctx, ciphertext, &mut ciphertext_len)
@@ -142,7 +139,7 @@ fn seal_finalize(ctx: &SealContext) -> Result<Vec<u8>>
     conv::res_c_to_rs(r)?;
     assert!(ciphertext_len <= output_len);
     unsafe {
-        ciphertext_vec.set_len(ciphertext_len as usize);
+        ciphertext_vec.set_len(ciphertext_len);
     };
     Ok(ciphertext_vec)
 }
@@ -156,12 +153,10 @@ impl Drop for OpenContext {
     fn drop(&mut self)
     {
         unsafe {
-            lib::yaca_context_destroy(self.handle);
-        };
+            lib::yaca_context_destroy(self.handle)
+        }
     }
 }
-
-impl crypto::Sealed for OpenContext {}
 
 impl Context for OpenContext {
     fn get_handle(&self) -> *mut c_void
@@ -214,7 +209,7 @@ fn open_initialize(prv_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode
         Some(i) => key::get_handle(&i),
         None => ptr::null(),
     };
-    let mut handle: *mut c_void = ptr::null_mut();
+    let mut handle = ptr::null_mut();
     let r = unsafe {
         lib::yaca_open_initialize(&mut handle, prv_key, algo, bcm,
                                   sym_key_bit_len, sym_key, iv)
@@ -228,15 +223,14 @@ fn open_initialize(prv_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode
 fn open_set_input_length(ctx: &OpenContext, input_len: usize) -> Result<()>
 {
     let ctx = ctx.get_handle();
-    let ciphertext = ptr::null() as *const c_char;
-    let ciphertext_len = input_len as size_t;
-    let plaintext = ptr::null_mut() as *mut c_char;
-    let mut plaintext_len: size_t = mem::size_of::<size_t>();
+    let ciphertext = ptr::null();
+    let ciphertext_len = input_len;
+    let plaintext = ptr::null_mut();
+    let mut plaintext_len = mem::size_of::<size_t>();
     let r = unsafe {
         lib::yaca_open_update(ctx, ciphertext, ciphertext_len, plaintext, &mut plaintext_len)
     };
-    conv::res_c_to_rs(r)?;
-    Ok(())
+    conv::res_c_to_rs(r)
 }
 
 #[inline]
@@ -250,7 +244,7 @@ fn open_update(ctx: &OpenContext, ciphertext: &[u8]) -> Result<Vec<u8>>
         _ => ciphertext.as_ptr() as *const c_char,
     };
     let mut plaintext_vec: Vec<u8> = Vec::with_capacity(output_len);
-    let mut plaintext_len: size_t = 0;
+    let mut plaintext_len = 0;
     let plaintext = plaintext_vec.as_mut_ptr() as *mut c_char;
     let r = unsafe {
         lib::yaca_open_update(ctx, ciphertext, ciphertext_len, plaintext, &mut plaintext_len)
@@ -258,7 +252,7 @@ fn open_update(ctx: &OpenContext, ciphertext: &[u8]) -> Result<Vec<u8>>
     conv::res_c_to_rs(r)?;
     assert!(plaintext_len <= output_len);
     unsafe {
-        plaintext_vec.set_len(plaintext_len as usize);
+        plaintext_vec.set_len(plaintext_len);
     };
     Ok(plaintext_vec)
 }
@@ -269,7 +263,7 @@ fn open_finalize(ctx: &OpenContext) -> Result<Vec<u8>>
     let output_len = ctx.get_output_length(0)?;
     let ctx = ctx.handle;
     let mut plaintext_vec: Vec<u8> = Vec::with_capacity(output_len);
-    let mut plaintext_len: size_t = 0;
+    let mut plaintext_len = 0;
     let plaintext = plaintext_vec.as_mut_ptr() as *mut c_char;
     let r = unsafe {
         lib::yaca_open_finalize(ctx, plaintext, &mut plaintext_len)
@@ -277,7 +271,7 @@ fn open_finalize(ctx: &OpenContext) -> Result<Vec<u8>>
     conv::res_c_to_rs(r)?;
     assert!(plaintext_len <= output_len);
     unsafe {
-        plaintext_vec.set_len(plaintext_len as usize);
+        plaintext_vec.set_len(plaintext_len);
     };
     Ok(plaintext_vec)
 }
