@@ -10,3 +10,4 @@ description = "Bindings for the YACA library"
 
 [dependencies]
 libc = "0.2.0"
+num = "0.2.1"

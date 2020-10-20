@@ -1,3 +1,21 @@
+/*
+ *  Copyright (c) 2020 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *  Contact: Lukasz Pawelczyk <l.pawelczyk@samsung.com>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License
+ */
+
 use std::ffi::CString;
 use yaca::*;
 
@@ -17,31 +35,31 @@ fn key_gen()
     assert_eq!(key_sym.get_type().unwrap(), KeyType::Symmetric);
     assert_eq!(key_sym.get_length().unwrap(), KeyLength::Bits(256));
 
-    let key_rsa_prv = Key::generate(&KeyType::Rsa(Private),
+    let key_rsa_prv = Key::generate(&KeyType::RsaPrivate,
                                     &KeyLength::Bits(2048)).unwrap();
-    assert_eq!(key_rsa_prv.get_type().unwrap(), KeyType::Rsa(Private));
+    assert_eq!(key_rsa_prv.get_type().unwrap(), KeyType::RsaPrivate);
     assert_eq!(key_rsa_prv.get_length().unwrap(), KeyLength::Bits(2048));
 
     let key_rsa_pub = key_rsa_prv.extract_public().unwrap();
-    assert_eq!(key_rsa_pub.get_type().unwrap(), KeyType::Rsa(Public));
+    assert_eq!(key_rsa_pub.get_type().unwrap(), KeyType::RsaPublic);
     assert_eq!(key_rsa_pub.get_length().unwrap(), KeyLength::Bits(2048));
 
-    let key_dsa_prv = Key::generate(&KeyType::Dsa(Private),
+    let key_dsa_prv = Key::generate(&KeyType::DsaPrivate,
                                     &KeyLength::Bits(2048)).unwrap();
-    assert_eq!(key_dsa_prv.get_type().unwrap(), KeyType::Dsa(Private));
+    assert_eq!(key_dsa_prv.get_type().unwrap(), KeyType::DsaPrivate);
     assert_eq!(key_dsa_prv.get_length().unwrap(), KeyLength::Bits(2048));
 
     let key_dsa_pub = key_dsa_prv.extract_public().unwrap();
-    assert_eq!(key_dsa_pub.get_type().unwrap(), KeyType::Dsa(Public));
+    assert_eq!(key_dsa_pub.get_type().unwrap(), KeyType::DsaPublic);
     assert_eq!(key_dsa_pub.get_length().unwrap(), KeyLength::Bits(2048));
 
-    let key_dh_prv = Key::generate(&KeyType::Dh(Private),
+    let key_dh_prv = Key::generate(&KeyType::DhPrivate,
                                    &KeyLength::Dh(Rfc2048_256)).unwrap();
-    assert_eq!(key_dh_prv.get_type().unwrap(), KeyType::Dh(Private));
+    assert_eq!(key_dh_prv.get_type().unwrap(), KeyType::DhPrivate);
     assert_eq!(key_dh_prv.get_length().unwrap(), KeyLength::Bits(2048));
 
     let key_dh_pub = key_dh_prv.extract_public().unwrap();
-    assert_eq!(key_dh_pub.get_type().unwrap(), KeyType::Dh(Public));
+    assert_eq!(key_dh_pub.get_type().unwrap(), KeyType::DhPublic);
     assert_eq!(key_dh_pub.get_length().unwrap(), KeyLength::Bits(2048));
 
     let key_dh_params = key_dh_prv.extract_parameters().unwrap();
@@ -49,18 +67,18 @@ fn key_gen()
     assert_eq!(key_dh_prv_2.get_type().unwrap(), key_dh_prv.get_type().unwrap());
     assert_eq!(key_dh_prv_2.get_length().unwrap(), key_dh_prv.get_length().unwrap());
 
-    let key_dh_prv_3 = Key::generate(&KeyType::Dh(Private),
+    let key_dh_prv_3 = Key::generate(&KeyType::DhPrivate,
                                      &KeyLength::Dh(Generator5Bits(256))).unwrap();
-    assert_eq!(key_dh_prv_3.get_type().unwrap(), KeyType::Dh(Private));
+    assert_eq!(key_dh_prv_3.get_type().unwrap(), KeyType::DhPrivate);
     assert_eq!(key_dh_prv_3.get_length().unwrap(), KeyLength::Bits(256));
 
-    let key_ec_prv = Key::generate(&KeyType::Ec(Private),
+    let key_ec_prv = Key::generate(&KeyType::EcPrivate,
                                    &KeyLength::Ec(Prime256V1)).unwrap();
-    assert_eq!(key_ec_prv.get_type().unwrap(), KeyType::Ec(Private));
+    assert_eq!(key_ec_prv.get_type().unwrap(), KeyType::EcPrivate);
     assert_eq!(key_ec_prv.get_length().unwrap(), KeyLength::Ec(Prime256V1));
 
     let key_ec_pub = key_ec_prv.extract_public().unwrap();
-    assert_eq!(key_ec_pub.get_type().unwrap(), KeyType::Ec(Public));
+    assert_eq!(key_ec_pub.get_type().unwrap(), KeyType::EcPublic);
     assert_eq!(key_ec_pub.get_length().unwrap(), KeyLength::Ec(Prime256V1));
 }
 
@@ -69,7 +87,7 @@ fn key_exp_imp()
 {
     // prepare
     let key_sym = Key::generate(&KeyType::Symmetric, &KeyLength::Bits(256)).unwrap();
-    let key_rsa_prv = Key::generate(&KeyType::Rsa(Private),
+    let key_rsa_prv = Key::generate(&KeyType::RsaPrivate,
                                     &KeyLength::Bits(2048)).unwrap();
     let password = CString::new("password").unwrap();
     // end prepare
@@ -82,14 +100,14 @@ fn key_exp_imp()
 
     let key_rsa_prv_exp = key_rsa_prv.export(&KeyFormat::Default,
                                              &KeyFileFormat::Pem, None).unwrap();
-    let key_rsa_prv_imp = Key::import(&key_rsa_prv_exp, &KeyType::Rsa(Private),
+    let key_rsa_prv_imp = Key::import(&key_rsa_prv_exp, &KeyType::RsaPrivate,
                                       None).unwrap();
     assert_eq!(key_rsa_prv.get_type().unwrap(), key_rsa_prv_imp.get_type().unwrap());
     assert_eq!(key_rsa_prv.get_length().unwrap(), key_rsa_prv_imp.get_length().unwrap());
 
     let key_rsa_prv_exp = key_rsa_prv.export(&KeyFormat::Pkcs8,
                                              &KeyFileFormat::Pem, Some(&password)).unwrap();
-    let key_rsa_prv_imp = Key::import(&key_rsa_prv_exp, &KeyType::Rsa(Private),
+    let key_rsa_prv_imp = Key::import(&key_rsa_prv_exp, &KeyType::RsaPrivate,
                                       Some(&password)).unwrap();
     assert_eq!(key_rsa_prv.get_type().unwrap(), key_rsa_prv_imp.get_type().unwrap());
     assert_eq!(key_rsa_prv.get_length().unwrap(), key_rsa_prv_imp.get_length().unwrap());
@@ -99,7 +117,7 @@ fn key_exp_imp()
 fn key_derive()
 {
     // prepare:
-    let key_dh_prv = Key::generate(&KeyType::Dh(Private),
+    let key_dh_prv = Key::generate(&KeyType::DhPrivate,
                                    &KeyLength::Dh(Rfc2048_256)).unwrap();
     let key_dh_pub = key_dh_prv.extract_public().unwrap();
     let key_dh_params = key_dh_prv.extract_parameters().unwrap();

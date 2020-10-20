@@ -1,6 +1,23 @@
-use libc::{size_t, c_void, c_char};
+/*
+ *  Copyright (c) 2020 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *  Contact: Lukasz Pawelczyk <l.pawelczyk@samsung.com>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License
+ */
+
+use libc::{c_void, c_char};
 use std::ptr;
-use std::mem;
 
 use crate::yaca_lib as lib;
 use crate::yaca_conv as conv;
@@ -9,7 +26,7 @@ use crate::crypto::{Context, ContextWithPadding, ContextWithRc2Supported,
 use crate::*;
 
 
-/// Context for seal operations
+/// Context for `Seal` operations
 pub struct SealContext {
     handle: *mut c_void,
 }
@@ -33,26 +50,51 @@ impl Context for SealContext {
 impl ContextWithPadding for SealContext {}
 impl ContextWithRc2Supported for SealContext {}
 impl ContextWithXcmEncryptProperties for SealContext {
-    fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>
+    fn set_property_ccm_aad(&self, ccm_aad: &[u8], plaintext_len: usize) -> Result<()>
     {
-        seal_set_input_length(self, input_len)?;
+        seal_set_input_length(self, plaintext_len)?;
         crypto::context_set_property_multiple(self, types::Property::CcmAad, ccm_aad)
     }
 }
 
 impl SealContext {
-    /// Initializes an encryption context.
+    /// Initializes an asymmetric encryption context and generates
+    /// symmetric key and Initialization Vector
+    ///
+    /// - `pub_key` is a key that the returned symmetric key will be
+    ///   encrypted with, it must be of [`KeyType::RsaPublic`] type.
+    /// - `algo` is an encryption algorithm used to encrypt the data.
+    /// - `bcm` is a chaining used to encrypt the data.
+    /// - `sym_key_length` defines the length of a generated symmetric
+    ///   key, it must be at least 88 bits shorter than the `pub_key`
+    ///   bit length.
+    /// - The function returns a tupple of context, generated and
+    ///   encrypted symmetric key and generated Initialization Vector
+    ///   of the default length for a given encryption configuration
+    ///   (or `None`).
+    /// - The generated symmetric key is encrypted with public key, so
+    ///   can be only used with [`OpenContext::initialize()`]. It can be
+    ///   exported, but after import it can be only used with
+    ///   [`OpenContext::initialize()`] as well.
+    ///
+    /// [`KeyType::RsaPublic`]: enum.KeyType.html#variant.RsaPublic
+    /// [`OpenContext::initialize()`]: struct.OpenContext.html#method.initialize
     pub fn initialize(pub_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
                       sym_key_length: &KeyLength) -> Result<(SealContext, Key, Option<Key>)>
     {
         seal_initialize(pub_key, algo, bcm, sym_key_length)
     }
-    /// Encrypts chunk of the data.
+    /// Encrypts chunk of the data
+    ///
+    /// - `plaintext` is a chunk of data to be encrypted.
+    /// - Returns a chunk of encrypted data.
     pub fn update(&self, plaintext: &[u8]) -> Result<Vec<u8>>
     {
         seal_update(self, plaintext)
     }
-    /// Encrypts the final chunk of the data.
+    /// Encrypts the final chunk of the data
+    ///
+    /// - Returns the final chunk of encrypted data.
     pub fn finalize(&self) -> Result<Vec<u8>>
     {
         seal_finalize(&self)
@@ -75,8 +117,8 @@ fn seal_initialize(pub_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode
                                   &mut sym_key, &mut iv)
     };
     conv::res_c_to_rs(r)?;
-    assert!(!sym_key.is_null());
-    assert!(!handle.is_null());
+    debug_assert!(!sym_key.is_null());
+    debug_assert!(!handle.is_null());
     let iv = if !iv.is_null() {
         Some(key::new_key(iv))
     } else {
@@ -94,7 +136,7 @@ fn seal_set_input_length(ctx: &SealContext, input_len: usize) -> Result<()>
     let plaintext = ptr::null();
     let plaintext_len = input_len;
     let ciphertext = ptr::null_mut();
-    let mut ciphertext_len = mem::size_of::<size_t>();
+    let mut ciphertext_len = 0;
     let r = unsafe {
         lib::yaca_seal_update(ctx, plaintext, plaintext_len, ciphertext, &mut ciphertext_len)
     };
@@ -118,7 +160,7 @@ fn seal_update(ctx: &SealContext, plaintext: &[u8]) -> Result<Vec<u8>>
         lib::yaca_seal_update(ctx, plaintext, plaintext_len, ciphertext, &mut ciphertext_len)
     };
     conv::res_c_to_rs(r)?;
-    assert!(ciphertext_len <= output_len);
+    debug_assert!(ciphertext_len <= output_len);
     unsafe {
         ciphertext_vec.set_len(ciphertext_len);
     };
@@ -137,14 +179,14 @@ fn seal_finalize(ctx: &SealContext) -> Result<Vec<u8>>
         lib::yaca_seal_finalize(ctx, ciphertext, &mut ciphertext_len)
     };
     conv::res_c_to_rs(r)?;
-    assert!(ciphertext_len <= output_len);
+    debug_assert!(ciphertext_len <= output_len);
     unsafe {
         ciphertext_vec.set_len(ciphertext_len);
     };
     Ok(ciphertext_vec)
 }
 
-/// Context for open operations
+/// Context for `Open` operations
 pub struct OpenContext {
     handle: *mut c_void,
 }
@@ -168,15 +210,22 @@ impl Context for OpenContext {
 impl ContextWithPadding for OpenContext {}
 impl ContextWithRc2Supported for OpenContext {}
 impl ContextWithXcmDecryptProperties for OpenContext {
-    fn set_property_ccm_aad(&self, ccm_aad: &[u8], input_len: usize) -> Result<()>
+    fn set_property_ccm_aad(&self, ccm_aad: &[u8], ciphertext_len: usize) -> Result<()>
     {
-        open_set_input_length(self, input_len)?;
+        open_set_input_length(self, ciphertext_len)?;
         crypto::context_set_property_multiple(self, types::Property::CcmAad, ccm_aad)
     }
 }
 
 impl OpenContext {
-    /// Initializes an decryption context.
+    /// Initializes an asymmetric decryption context
+    ///
+    /// - `prv_key` is a matching key to the public one that was used
+    ///   in the encryption.
+    /// - Other parameters passed must match the parameters used to encrypt the data.
+    /// - See [`SealContext::initialize()`].
+    ///
+    /// [`SealContext::initialize()`]: struct.SealContext.html#method.initialize
     pub fn initialize(prv_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode,
                       sym_key_length: &KeyLength, sym_key: &Key,
                       iv: Option<&Key>) -> Result<OpenContext>
@@ -184,11 +233,16 @@ impl OpenContext {
         open_initialize(prv_key, algo, bcm, sym_key_length, sym_key, iv)
     }
     /// Decrypts chunk of the data.
-    pub fn update(&self, plaintext: &[u8]) -> Result<Vec<u8>>
+    ///
+    /// - `ciphertext` is a chunk of encrypted data to be decrypted.
+    /// - Returns a chunk of decrypted data.
+    pub fn update(&self, ciphertext: &[u8]) -> Result<Vec<u8>>
     {
-        open_update(self, plaintext)
+        open_update(self, ciphertext)
     }
     /// Decrypts the final chunk of the data.
+    ///
+    /// - Returns the final chunk of decrypted data.
     pub fn finalize(&self) -> Result<Vec<u8>>
     {
         open_finalize(&self)
@@ -215,7 +269,7 @@ fn open_initialize(prv_key: &Key, algo: &EncryptAlgorithm, bcm: &BlockCipherMode
                                   sym_key_bit_len, sym_key, iv)
     };
     conv::res_c_to_rs(r)?;
-    assert!(!handle.is_null());
+    debug_assert!(!handle.is_null());
     Ok(OpenContext{handle})
 }
 
@@ -226,7 +280,7 @@ fn open_set_input_length(ctx: &OpenContext, input_len: usize) -> Result<()>
     let ciphertext = ptr::null();
     let ciphertext_len = input_len;
     let plaintext = ptr::null_mut();
-    let mut plaintext_len = mem::size_of::<size_t>();
+    let mut plaintext_len = 0;
     let r = unsafe {
         lib::yaca_open_update(ctx, ciphertext, ciphertext_len, plaintext, &mut plaintext_len)
     };
@@ -250,7 +304,7 @@ fn open_update(ctx: &OpenContext, ciphertext: &[u8]) -> Result<Vec<u8>>
         lib::yaca_open_update(ctx, ciphertext, ciphertext_len, plaintext, &mut plaintext_len)
     };
     conv::res_c_to_rs(r)?;
-    assert!(plaintext_len <= output_len);
+    debug_assert!(plaintext_len <= output_len);
     unsafe {
         plaintext_vec.set_len(plaintext_len);
     };
@@ -269,7 +323,7 @@ fn open_finalize(ctx: &OpenContext) -> Result<Vec<u8>>
         lib::yaca_open_finalize(ctx, plaintext, &mut plaintext_len)
     };
     conv::res_c_to_rs(r)?;
-    assert!(plaintext_len <= output_len);
+    debug_assert!(plaintext_len <= output_len);
     unsafe {
         plaintext_vec.set_len(plaintext_len);
     };

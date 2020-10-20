@@ -1,17 +1,35 @@
-use libc::{c_int, size_t};
+/*
+ *  Copyright (c) 2020 Samsung Electronics Co., Ltd All Rights Reserved
+ *
+ *  Contact: Lukasz Pawelczyk <l.pawelczyk@samsung.com>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License
+ */
+
+use libc::{c_int, size_t, EINVAL, ENOMEM};
 
 use crate::*;
 
 
 const BASE_ERROR_YACA:              c_int = -0x01E30000;
 const YACA_ERROR_NONE:              c_int = 0;
-const YACA_ERROR_INVALID_PARAMETER: c_int = -22;
-const YACA_ERROR_OUT_OF_MEMORY:     c_int = -12;
+const YACA_ERROR_INVALID_PARAMETER: c_int = -EINVAL;
+const YACA_ERROR_OUT_OF_MEMORY:     c_int = -ENOMEM;
 const YACA_ERROR_INTERNAL:          c_int = BASE_ERROR_YACA | 0x01;
 const YACA_ERROR_DATA_MISMATCH:     c_int = BASE_ERROR_YACA | 0x02;
 const YACA_ERROR_INVALID_PASSWORD:  c_int = BASE_ERROR_YACA | 0x03;
 
-pub(crate) fn res_c_to_rs(r: c_int) -> crate::Result<()>
+pub(crate) fn res_c_to_rs(r: c_int) -> Result<()>
 {
     match r {
         YACA_ERROR_NONE => Result::Ok(()),
@@ -24,7 +42,7 @@ pub(crate) fn res_c_to_rs(r: c_int) -> crate::Result<()>
     }
 }
 
-pub(crate) fn res_c_to_rs_bool(r: c_int) -> crate::Result<bool>
+pub(crate) fn res_c_to_rs_bool(r: c_int) -> Result<bool>
 {
     match r {
         YACA_ERROR_NONE => Result::Ok(true),
@@ -59,18 +77,17 @@ pub(crate) fn key_type_rs_to_c(kt: &KeyType) -> c_int
         KeyType::Symmetric => YACA_KEY_TYPE_SYMMETRIC,
         KeyType::Des => YACA_KEY_TYPE_DES,
         KeyType::Iv => YACA_KEY_TYPE_IV,
-        KeyType::Rsa(KeySubType::Public) => YACA_KEY_TYPE_RSA_PUB,
-        KeyType::Rsa(KeySubType::Private) => YACA_KEY_TYPE_RSA_PRIV,
-        KeyType::Dsa(KeySubType::Public) => YACA_KEY_TYPE_DSA_PUB,
-        KeyType::Dsa(KeySubType::Private) => YACA_KEY_TYPE_DSA_PRIV,
-        KeyType::Dh(KeySubType::Public) => YACA_KEY_TYPE_DH_PUB,
-        KeyType::Dh(KeySubType::Private) => YACA_KEY_TYPE_DH_PRIV,
-        KeyType::Ec(KeySubType::Public) => YACA_KEY_TYPE_EC_PUB,
-        KeyType::Ec(KeySubType::Private) => YACA_KEY_TYPE_EC_PRIV,
-        KeyType::Rsa(KeySubType::Params) => panic!("No KeySubType::Params for RSA"),
-        KeyType::Dsa(KeySubType::Params) => YACA_KEY_TYPE_DSA_PARAMS,
-        KeyType::Dh(KeySubType::Params) => YACA_KEY_TYPE_DH_PARAMS,
-        KeyType::Ec(KeySubType::Params) => YACA_KEY_TYPE_EC_PARAMS,
+        KeyType::RsaPublic => YACA_KEY_TYPE_RSA_PUB,
+        KeyType::RsaPrivate => YACA_KEY_TYPE_RSA_PRIV,
+        KeyType::DsaPublic => YACA_KEY_TYPE_DSA_PUB,
+        KeyType::DsaPrivate => YACA_KEY_TYPE_DSA_PRIV,
+        KeyType::DhPublic => YACA_KEY_TYPE_DH_PUB,
+        KeyType::DhPrivate => YACA_KEY_TYPE_DH_PRIV,
+        KeyType::EcPublic => YACA_KEY_TYPE_EC_PUB,
+        KeyType::EcPrivate => YACA_KEY_TYPE_EC_PRIV,
+        KeyType::DsaParams => YACA_KEY_TYPE_DSA_PARAMS,
+        KeyType::DhParams => YACA_KEY_TYPE_DH_PARAMS,
+        KeyType::EcParams => YACA_KEY_TYPE_EC_PARAMS,
     }
 }
 
@@ -80,18 +97,21 @@ pub(crate) fn key_type_c_to_rs(kt: c_int) -> KeyType
         YACA_KEY_TYPE_SYMMETRIC => KeyType::Symmetric,
         YACA_KEY_TYPE_DES => KeyType::Des,
         YACA_KEY_TYPE_IV => KeyType::Iv,
-        YACA_KEY_TYPE_RSA_PRIV => KeyType::Rsa(KeySubType::Private),
-        YACA_KEY_TYPE_RSA_PUB => KeyType::Rsa(KeySubType::Public),
-        YACA_KEY_TYPE_DSA_PRIV => KeyType::Dsa(KeySubType::Private),
-        YACA_KEY_TYPE_DSA_PUB => KeyType::Dsa(KeySubType::Public),
-        YACA_KEY_TYPE_DSA_PARAMS => KeyType::Dsa(KeySubType::Params),
-        YACA_KEY_TYPE_EC_PRIV => KeyType::Ec(KeySubType::Private),
-        YACA_KEY_TYPE_EC_PUB => KeyType::Ec(KeySubType::Public),
-        YACA_KEY_TYPE_EC_PARAMS => KeyType::Ec(KeySubType::Params),
-        YACA_KEY_TYPE_DH_PRIV => KeyType::Dh(KeySubType::Private),
-        YACA_KEY_TYPE_DH_PUB => KeyType::Dh(KeySubType::Public),
-        YACA_KEY_TYPE_DH_PARAMS => KeyType::Dh(KeySubType::Params),
-        x => panic!("Wrong key_type passed from C: {}", x),
+        YACA_KEY_TYPE_RSA_PRIV => KeyType::RsaPrivate,
+        YACA_KEY_TYPE_RSA_PUB => KeyType::RsaPublic,
+        YACA_KEY_TYPE_DSA_PRIV => KeyType::DsaPrivate,
+        YACA_KEY_TYPE_DSA_PUB => KeyType::DsaPublic,
+        YACA_KEY_TYPE_DSA_PARAMS => KeyType::DsaParams,
+        YACA_KEY_TYPE_EC_PRIV => KeyType::EcPrivate,
+        YACA_KEY_TYPE_EC_PUB => KeyType::EcPublic,
+        YACA_KEY_TYPE_EC_PARAMS => KeyType::EcParams,
+        YACA_KEY_TYPE_DH_PRIV => KeyType::DhPrivate,
+        YACA_KEY_TYPE_DH_PUB => KeyType::DhPublic,
+        YACA_KEY_TYPE_DH_PARAMS => KeyType::DhParams,
+        x => {
+            debug_assert!(false, "Wrong key_type passed from C: {}", x);
+            KeyType::Symmetric
+        },
     }
 }
 
@@ -112,17 +132,17 @@ pub(crate) fn key_length_rs_to_c(kl: &KeyLength) -> size_t
 {
     match kl {
         KeyLength::Bits(bl) => *bl as size_t,
-        KeyLength::Ec(KeyLengthEc::Prime192V1) => YACA_KEY_LENGTH_EC_PRIME192V1 as size_t,
-        KeyLength::Ec(KeyLengthEc::Prime256V1) => YACA_KEY_LENGTH_EC_PRIME256V1 as size_t,
-        KeyLength::Ec(KeyLengthEc::Secp256K1) => YACA_KEY_LENGTH_EC_SECP256K1 as size_t,
-        KeyLength::Ec(KeyLengthEc::Secp384R1) => YACA_KEY_LENGTH_EC_SECP384R1 as size_t,
-        KeyLength::Ec(KeyLengthEc::Secp521R1) => YACA_KEY_LENGTH_EC_SECP521R1 as size_t,
-        KeyLength::Dh(KeyLengthDh::Rfc1024_160) => YACA_KEY_LENGTH_DH_RFC_1024_160 as size_t,
-        KeyLength::Dh(KeyLengthDh::Rfc2048_224) => YACA_KEY_LENGTH_DH_RFC_2048_224 as size_t,
-        KeyLength::Dh(KeyLengthDh::Rfc2048_256) => YACA_KEY_LENGTH_DH_RFC_2048_256 as size_t,
-        KeyLength::Dh(KeyLengthDh::Generator2Bits(bl)) =>
+        KeyLength::Ec(Prime192V1) => YACA_KEY_LENGTH_EC_PRIME192V1 as size_t,
+        KeyLength::Ec(Prime256V1) => YACA_KEY_LENGTH_EC_PRIME256V1 as size_t,
+        KeyLength::Ec(Secp256K1) => YACA_KEY_LENGTH_EC_SECP256K1 as size_t,
+        KeyLength::Ec(Secp384R1) => YACA_KEY_LENGTH_EC_SECP384R1 as size_t,
+        KeyLength::Ec(Secp521R1) => YACA_KEY_LENGTH_EC_SECP521R1 as size_t,
+        KeyLength::Dh(Rfc1024_160) => YACA_KEY_LENGTH_DH_RFC_1024_160 as size_t,
+        KeyLength::Dh(Rfc2048_224) => YACA_KEY_LENGTH_DH_RFC_2048_224 as size_t,
+        KeyLength::Dh(Rfc2048_256) => YACA_KEY_LENGTH_DH_RFC_2048_256 as size_t,
+        KeyLength::Dh(Generator2Bits(bl)) =>
             (YACA_KEY_LENGTH_DH_GENERATOR_2 as size_t | *bl as size_t),
-        KeyLength::Dh(KeyLengthDh::Generator5Bits(bl)) =>
+        KeyLength::Dh(Generator5Bits(bl)) =>
             (YACA_KEY_LENGTH_DH_GENERATOR_5 as size_t | *bl as size_t),
     }
 }
@@ -131,13 +151,19 @@ pub(crate) fn key_length_c_to_rs(kl: size_t) -> KeyLength
 {
     const MAX_BITS: c_int = std::u16::MAX as c_int;
     match kl as c_int {
-        bl @ 0..=MAX_BITS => KeyLength::Bits(bl as u16),
-        YACA_KEY_LENGTH_EC_PRIME192V1 => KeyLength::Ec(KeyLengthEc::Prime192V1),
-        YACA_KEY_LENGTH_EC_PRIME256V1 => KeyLength::Ec(KeyLengthEc::Prime256V1),
-        YACA_KEY_LENGTH_EC_SECP256K1 => KeyLength::Ec(KeyLengthEc::Secp256K1),
-        YACA_KEY_LENGTH_EC_SECP384R1 => KeyLength::Ec(KeyLengthEc::Secp384R1),
-        YACA_KEY_LENGTH_EC_SECP521R1 => KeyLength::Ec(KeyLengthEc::Secp521R1),
-        x => panic!("Wrong key_bit_length passed from C: {}", x),
+        bl @ 8..=MAX_BITS => {
+            debug_assert!(bl % 8 == 0, "key_bit_length passed from C is not divisable by 8: {}", bl);
+            KeyLength::Bits(bl as u16)
+        },
+        YACA_KEY_LENGTH_EC_PRIME192V1 => KeyLength::Ec(Prime192V1),
+        YACA_KEY_LENGTH_EC_PRIME256V1 => KeyLength::Ec(Prime256V1),
+        YACA_KEY_LENGTH_EC_SECP256K1 => KeyLength::Ec(Secp256K1),
+        YACA_KEY_LENGTH_EC_SECP384R1 => KeyLength::Ec(Secp384R1),
+        YACA_KEY_LENGTH_EC_SECP521R1 => KeyLength::Ec(Secp521R1),
+        x => {
+            debug_assert!(false, "Wrong key_bit_length passed from C: {}", x);
+            KeyLength::Bits(0)
+        },
     }
 }
 
