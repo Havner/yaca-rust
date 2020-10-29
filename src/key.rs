@@ -331,7 +331,7 @@ fn key_export(key: &Key, key_fmt: &KeyFormat, key_file_fmt: &KeyFileFormat,
                              password, &mut data, &mut data_len)
     };
     conv::res_c_to_rs(r)?;
-    Ok(yaca_common::vector_from_raw(data_len, data))
+    Ok(common::vector_from_raw(data_len, data))
 }
 
 #[inline]
@@ -428,7 +428,7 @@ fn key_derive_kdf(kdf: &Kdf, algo: &DigestAlgorithm,
                                  key_material_len, &mut key_material)
     };
     conv::res_c_to_rs(r)?;
-    Ok(yaca_common::vector_from_raw(key_material_len, key_material))
+    Ok(common::vector_from_raw(key_material_len, key_material))
 }
 
 #[inline]

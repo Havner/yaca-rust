@@ -19,6 +19,7 @@
 use libc::{c_void, c_char};
 use std::ptr;
 
+use crate::yaca_common as common;
 use crate::yaca_lib as lib;
 use crate::yaca_conv as conv;
 use crate::crypto::{Context, ContextWithPadding};
@@ -140,28 +141,14 @@ impl SignContext {
 #[inline]
 fn sign_initialize(algo: &DigestAlgorithm, prv_key: &Key) -> Result<SignContext>
 {
-    let algo = conv::digest_rs_to_c(algo);
-    let prv_key = key::get_handle(prv_key);
-    let mut handle = ptr::null_mut();
-    let r = unsafe {
-        lib::yaca_sign_initialize(&mut handle, algo, prv_key)
-    };
-    conv::res_c_to_rs(r)?;
-    debug_assert!(!handle.is_null());
+    let handle = common::sign_init(algo, prv_key, lib::yaca_sign_initialize)?;
     Ok(SignContext{handle})
 }
 
 #[inline]
 fn sign_initialize_hmac(algo: &DigestAlgorithm, sym_key: &Key) -> Result<SignContext>
 {
-    let algo = conv::digest_rs_to_c(algo);
-    let sym_key = key::get_handle(sym_key);
-    let mut handle = ptr::null_mut();
-    let r = unsafe {
-        lib::yaca_sign_initialize_hmac(&mut handle, algo, sym_key)
-    };
-    conv::res_c_to_rs(r)?;
-    debug_assert!(!handle.is_null());
+    let handle = common::sign_init(algo, sym_key, lib::yaca_sign_initialize_hmac)?;
     Ok(SignContext{handle})
 }
 
@@ -182,31 +169,13 @@ fn sign_initialize_cmac(algo: &EncryptAlgorithm, sym_key: &Key) -> Result<SignCo
 #[inline]
 fn sign_update(ctx: &SignContext, message: &[u8]) -> Result<()>
 {
-    let message_len = message.len();
-    let message = message.as_ptr() as *const c_char;
-    let r = unsafe {
-        lib::yaca_sign_update(ctx.handle, message, message_len)
-    };
-    conv::res_c_to_rs(r)
+    common::hash_upd(ctx, message, lib::yaca_sign_update)
 }
 
 #[inline]
 fn sign_finalize(ctx: &SignContext) -> Result<Vec<u8>>
 {
-    let output_len = ctx.get_output_length(0)?;
-    debug_assert!(output_len > 0);
-    let mut digest_vec: Vec<u8> = Vec::with_capacity(output_len);
-    let digest = digest_vec.as_mut_ptr() as *mut c_char;
-    let mut digest_len = output_len;
-    let r = unsafe {
-        lib::yaca_sign_finalize(ctx.handle, digest, &mut digest_len)
-    };
-    conv::res_c_to_rs(r)?;
-    debug_assert!(digest_len <= output_len);
-    unsafe {
-        digest_vec.set_len(digest_len);
-    };
-    Ok(digest_vec)
+    common::hash_fin(ctx, lib::yaca_sign_finalize)
 }
 
 
@@ -278,26 +247,14 @@ impl VerifyContext {
 #[inline]
 fn verify_initialize(algo: &DigestAlgorithm, pub_key: &Key) -> Result<VerifyContext>
 {
-    let algo = conv::digest_rs_to_c(algo);
-    let pub_key = key::get_handle(pub_key);
-    let mut handle = ptr::null_mut();
-    let r = unsafe {
-        lib::yaca_verify_initialize(&mut handle, algo, pub_key)
-    };
-    conv::res_c_to_rs(r)?;
-    debug_assert!(!handle.is_null());
+    let handle = common::sign_init(algo, pub_key, lib::yaca_verify_initialize)?;
     Ok(VerifyContext{handle})
 }
 
 #[inline]
 fn verify_update(ctx: &VerifyContext, message: &[u8]) -> Result<()>
 {
-    let message_len = message.len();
-    let message = message.as_ptr() as *const c_char;
-    let r = unsafe {
-        lib::yaca_verify_update(ctx.handle, message, message_len)
-    };
-    conv::res_c_to_rs(r)
+    common::hash_upd(ctx, message, lib::yaca_verify_update)
 }
 
 #[inline]

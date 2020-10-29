@@ -16,9 +16,10 @@
  *  limitations under the License
  */
 
-use libc::{c_void, c_char};
+use libc::c_void;
 use std::ptr;
 
+use crate::yaca_common as common;
 use crate::yaca_lib as lib;
 use crate::yaca_conv as conv;
 use crate::crypto::Context;
@@ -92,29 +93,11 @@ fn digest_initialize(algo: &DigestAlgorithm) -> Result<DigestContext>
 #[inline]
 fn digest_update(ctx: &DigestContext, message: &[u8]) -> Result<()>
 {
-    let message_len = message.len();
-    let message = message.as_ptr() as *const c_char;
-    let r = unsafe {
-        lib::yaca_digest_update(ctx.handle, message, message_len)
-    };
-    conv::res_c_to_rs(r)
+    common::hash_upd(ctx, message, lib::yaca_digest_update)
 }
 
 #[inline]
 fn digest_finalize(ctx: &DigestContext) -> Result<Vec<u8>>
 {
-    let output_len = ctx.get_output_length(0)?;
-    debug_assert!(output_len > 0);
-    let mut digest_vec: Vec<u8> = Vec::with_capacity(output_len);
-    let digest = digest_vec.as_mut_ptr() as *mut c_char;
-    let mut digest_len = output_len;
-    let r = unsafe {
-        lib::yaca_digest_finalize(ctx.handle, digest, &mut digest_len)
-    };
-    conv::res_c_to_rs(r)?;
-    debug_assert!(digest_len <= output_len);
-    unsafe {
-        digest_vec.set_len(digest_len);
-    };
-    Ok(digest_vec)
+    common::hash_fin(ctx, lib::yaca_digest_finalize)
 }
