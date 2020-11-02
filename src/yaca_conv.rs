@@ -151,18 +151,15 @@ pub(crate) fn key_length_c_to_rs(kl: size_t) -> KeyLength
 {
     const MAX_BITS: c_int = std::u16::MAX as c_int;
     match kl as c_int {
-        bl @ 8..=MAX_BITS => {
-            debug_assert!(bl % 8 == 0, "key_bit_length passed from C is not divisable by 8: {}", bl);
-            KeyLength::Bits(bl as u16)
-        },
         YACA_KEY_LENGTH_EC_PRIME192V1 => KeyLength::Ec(Prime192V1),
         YACA_KEY_LENGTH_EC_PRIME256V1 => KeyLength::Ec(Prime256V1),
         YACA_KEY_LENGTH_EC_SECP256K1 => KeyLength::Ec(Secp256K1),
         YACA_KEY_LENGTH_EC_SECP384R1 => KeyLength::Ec(Secp384R1),
         YACA_KEY_LENGTH_EC_SECP521R1 => KeyLength::Ec(Secp521R1),
-        x => {
-            debug_assert!(false, "Wrong key_bit_length passed from C: {}", x);
-            KeyLength::Bits(0)
+        bl => {
+            debug_assert!(bl % 8 == 0, "key_bit_length passed from C is not divisable by 8: {}", bl);
+            debug_assert!(bl >= 8 && bl <= MAX_BITS, "Wrong key_bit_length passed from C: {}", bl);
+            KeyLength::Bits(bl as u16)
         },
     }
 }
