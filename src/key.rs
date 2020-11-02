@@ -182,8 +182,8 @@ impl Key {
     {
         key_extract_parameters(self)
     }
-    /// Derives a shared secret using Diffie-Helmann or EC
-    /// Diffie-Helmann key exchange protocol
+    /// Derives a shared secret using Diffie-Hellman or EC
+    /// Diffie-Hellman key exchange protocol
     ///
     /// - `prv_key` is our private key.
     /// - `pub_key` is a peer public key.
@@ -241,7 +241,7 @@ impl Key {
     /// - Can be used on any symmetric (including an Initialization
     ///   Vector) or asymmetric key (including key generation
     ///   parameters).
-    /// - For Diffie-Helmann returns prime length in
+    /// - For Diffie-Hellman returns prime length in
     ///   [`KeyLength::Bits`]. Values of [`KeyLengthDh`] used to
     ///   generate the key/parameters in [`Key::generate()`] are not
     ///   restored.

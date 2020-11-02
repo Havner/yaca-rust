@@ -69,7 +69,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     /// Sets the `GCM` tag length (in bytes)
     ///
     /// - Supported tag lengths: 4, 8, 12, 13, 14, 15, 16.
-	/// - Set after [`EncryptContext::finalize()`] / [`SealContext::finalize()`] and before
+    /// - Set after [`EncryptContext::finalize()`] / [`SealContext::finalize()`] and before
     ///   [`CtxXcmEnc::get_property_gcm_tag()`].
     /// - See [`BlockCipherMode::Gcm`] for more information.
     ///
@@ -83,7 +83,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     }
     /// Gets the `GCM` tag
     ///
-	/// - Get after [`EncryptContext::finalize()`] / [`SealContext::finalize()`].
+    /// - Get after [`EncryptContext::finalize()`] / [`SealContext::finalize()`].
     /// - See [`BlockCipherMode::Gcm`] for more information.
     ///
     /// [`EncryptContext::finalize()`]: struct.EncryptContext.html#method.finalize
@@ -96,8 +96,8 @@ pub trait ContextWithXcmEncryptProperties: Context {
     /// Sets the `GCM` Additional Authentication Data
     ///
     /// - AAD length can have any positive value.
-	/// - Set after [`EncryptContext::initialize()`] / [`SealContext::initialize()`] and before
-	///   [`EncryptContext::update()`] / [`SealContext::update()`] in `Encryption`/`Seal` operation.
+    /// - Set after [`EncryptContext::initialize()`] / [`SealContext::initialize()`] and before
+    ///   [`EncryptContext::update()`] / [`SealContext::update()`] in `Encryption`/`Seal` operation.
     /// - See [`BlockCipherMode::Gcm`] for more information.
     ///
     /// [`EncryptContext::initialize()`]: struct.EncryptContext.html#method.initialize
@@ -111,9 +111,9 @@ pub trait ContextWithXcmEncryptProperties: Context {
     }
     /// Sets the `CCM` Tag length in bytes
     ///
-	/// - Supported tag lengths: 4-16 bytes in steps of 2 bytes.
-	/// - Set after [`EncryptContext::initialize()`] / [`SealContext::initialize()`] and before
-	///   [`EncryptContext::update()`] / [`SealContext::update()`].
+    /// - Supported tag lengths: 4-16 bytes in steps of 2 bytes.
+    /// - Set after [`EncryptContext::initialize()`] / [`SealContext::initialize()`] and before
+    ///   [`EncryptContext::update()`] / [`SealContext::update()`].
     /// - See [`BlockCipherMode::Ccm`] for more information.
     ///
     /// [`EncryptContext::initialize()`]: struct.EncryptContext.html#method.initialize
@@ -127,7 +127,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     }
     /// Gets the `CCM` tag
     ///
-	/// - Get after [`EncryptContext::finalize()`] / [`SealContext::finalize()`].
+    /// - Get after [`EncryptContext::finalize()`] / [`SealContext::finalize()`].
     /// - See [`BlockCipherMode::Ccm`] for more information.
     ///
     /// [`EncryptContext::finalize()`]: struct.EncryptContext.html#method.finalize
@@ -139,10 +139,10 @@ pub trait ContextWithXcmEncryptProperties: Context {
     }
     /// Sets the `CCM` Additional Authentication Data
     ///
-	/// - AAD length can have any positive value.
+    /// - AAD length can have any positive value.
     /// - The total plaintext length must be passed.
-	/// - Set after [`EncryptContext::initialize()`] / [`SealContext::initialize()`] and before
-	///   [`EncryptContext::update()`] / [`SealContext::update()`].
+    /// - Set after [`EncryptContext::initialize()`] / [`SealContext::initialize()`] and before
+    ///   [`EncryptContext::update()`] / [`SealContext::update()`].
     /// - See [`BlockCipherMode::Ccm`] for more information.
     ///
     /// [`EncryptContext::initialize()`]: struct.EncryptContext.html#method.initialize
@@ -163,8 +163,8 @@ pub trait ContextWithXcmDecryptProperties: Context {
     ///
     /// - The tag is gotten during 'Encrypt'/'Seal' operation with
     ///   [`CtxXcmEnc::get_property_gcm_tag()`].
-	/// - Set after [`DecryptContext::update()`] / [`OpenContext::update()`] and before
-	///   [`DecryptContext::finalize()`] / [`OpenContext::finalize()`].
+    /// - Set after [`DecryptContext::update()`] / [`OpenContext::update()`] and before
+    ///   [`DecryptContext::finalize()`] / [`OpenContext::finalize()`].
     /// - See [`BlockCipherMode::Gcm`] for more information.
     ///
     /// [`CtxXcmEnc::get_property_gcm_tag()`]: trait.ContextWithXcmEncryptProperties.html#method.get_property_gcm_tag
@@ -179,10 +179,10 @@ pub trait ContextWithXcmDecryptProperties: Context {
     }
     /// Sets the `GCM` Additional Authentication Data
     ///
-	/// - AAD is the same data that is passed during 'Encrypt'/'Seal' operation with
+    /// - AAD is the same data that is passed during 'Encrypt'/'Seal' operation with
     ///   [`CtxXcmEnc::set_property_gcm_aad()`].
-	/// - Set after [`DecryptContext::initialize()`] / [`OpenContext::initialize()`] and before
-	///   [`DecryptContext::update()`] / [`OpenContext::update()`].
+    /// - Set after [`DecryptContext::initialize()`] / [`OpenContext::initialize()`] and before
+    ///   [`DecryptContext::update()`] / [`OpenContext::update()`].
     /// - See [`BlockCipherMode::Gcm`] for more information.
     ///
     /// [`CtxXcmEnc::set_property_gcm_aad()`]: trait.ContextWithXcmEncryptProperties.html#method.set_property_gcm_aad
@@ -199,8 +199,8 @@ pub trait ContextWithXcmDecryptProperties: Context {
     ///
     /// - The tag is gotten during 'Encrypt'/'Seal' operation with
     ///   [`CtxXcmEnc::get_property_ccm_tag()`].
-	/// - Set after [`DecryptContext::initialize()`] / [`OpenContext::initialize()`] and before
-	///   [`DecryptContext::update()`] / [`OpenContext::update()`].
+    /// - Set after [`DecryptContext::initialize()`] / [`OpenContext::initialize()`] and before
+    ///   [`DecryptContext::update()`] / [`OpenContext::update()`].
     /// - See [`BlockCipherMode::Ccm`] for more information.
     ///
     /// [`CtxXcmEnc::get_property_ccm_tag()`]: trait.ContextWithXcmEncryptProperties.html#method.get_property_ccm_tag
@@ -215,11 +215,11 @@ pub trait ContextWithXcmDecryptProperties: Context {
     }
     /// Sets the `CCM` Additional Authentication Data
     ///
-	/// - AAD is the same data that is passed during 'Encrypt'/'Seal' operation with
+    /// - AAD is the same data that is passed during 'Encrypt'/'Seal' operation with
     ///   [`CtxXcmEnc::set_property_ccm_aad()`].
     /// - The total ciphertext length must be passed.
-	/// - Set after [`DecryptContext::initialize()`] / [`OpenContext::initialize()`] and before
-	///   [`DecryptContext::update()`] / [`OpenContext::update()`] in `Decryption`/`Open` operation.
+    /// - Set after [`DecryptContext::initialize()`] / [`OpenContext::initialize()`] and before
+    ///   [`DecryptContext::update()`] / [`OpenContext::update()`] in `Decryption`/`Open` operation.
     /// - See [`BlockCipherMode::Ccm`] for more information.
     ///
     /// [`CtxXcmEnc::set_property_ccm_aad()`]: trait.ContextWithXcmEncryptProperties.html#method.set_property_ccm_aad

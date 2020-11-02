@@ -93,10 +93,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>>
     let sym_key = Key::generate(&KeyType::Symmetric, &KeyLength::Bits(256))?;
     let v = yaca::simple_encrypt(&EncryptAlgorithm::UnsafeRc4, &BlockCipherMode::None,
                                  &sym_key, None, &Vec::new())?;
-    debug_assert!(v.is_empty());
+    assert!(v.is_empty());
     let v = yaca::simple_decrypt(&EncryptAlgorithm::UnsafeRc4, &BlockCipherMode::None,
                                  &sym_key, None, &Vec::new())?;
-    debug_assert!(v.is_empty());
+    assert!(v.is_empty());
 
     // Simple encrypt/decrypt
 

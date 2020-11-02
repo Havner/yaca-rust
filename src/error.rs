@@ -24,12 +24,13 @@ use std::fmt;
 ///
 /// - All of the API functions return [`Result`] with an `Error`
 ///   embedded.
-/// - If `Result::Err` returned it will contain one of those values.
-/// - They are passed directly from the C `YACA` implementation.
-/// - Some of the occurences where `YACA` would return an error are
+/// - If `Result::Err` is returned it will contain one of those
+///   values.
+/// - They are passed directly from the C YACA implementation.
+/// - Some of the occurrences where YACA would return an error are
 ///   mitigated by Rust's type safety.
-/// - Some of the occurences where `YACA` would return `DataMismatch`
-///   are converted to return `bool` in the `Result:Ok`.
+/// - Some of the occurrences where YACA would return `DataMismatch`
+///   are converted to return `bool` in `Result:Ok`.
 ///
 /// [`Result`]: type.Result.html
 #[derive(Debug, PartialEq)]

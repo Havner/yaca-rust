@@ -65,14 +65,11 @@ pub fn simple_encrypt(algo: &EncryptAlgorithm, bcm: &BlockCipherMode, sym_key: &
                                  &mut ciphertext, &mut ciphertext_len)
     };
     conv::res_c_to_rs(r)?;
-    match ciphertext.is_null() {
-        true => {
-            debug_assert!(ciphertext_len == 0);
-            Ok(Vec::<u8>::new())
-        },
-        false => {
-            Ok(common::vector_from_raw(ciphertext_len, ciphertext))
-        },
+    if ciphertext.is_null() {
+        debug_assert!(ciphertext_len == 0);
+        Ok(Vec::<u8>::new())
+    } else {
+        Ok(common::vector_from_raw(ciphertext_len, ciphertext))
     }
 }
 
@@ -109,14 +106,11 @@ pub fn simple_decrypt(algo: &EncryptAlgorithm, bcm: &BlockCipherMode, sym_key: &
                                  &mut plaintext, &mut plaintext_len)
     };
     conv::res_c_to_rs(r)?;
-    match plaintext.is_null() {
-        true => {
-            debug_assert!(plaintext_len == 0);
-            Ok(Vec::<u8>::new())
-        },
-        false => {
-            Ok(common::vector_from_raw(plaintext_len, plaintext))
-        },
+    if plaintext.is_null() {
+        debug_assert!(plaintext_len == 0);
+        Ok(Vec::<u8>::new())
+    } else {
+        Ok(common::vector_from_raw(plaintext_len, plaintext))
     }
 }
 
@@ -189,13 +183,17 @@ pub fn simple_calculate_signature(algo: &DigestAlgorithm, prv_key: &Key,
 /// - `pub_key` is a matching public key to the one used to
 ///   calculate the signature, algorithm is deduced based on key
 ///   type, supported key types:
-///   * [`KeyType::Rsa(Public)`],
-///   * [`KeyType::Dsa(Public)`],
-///   * [`KeyType::Ec(Public)`].
+///   * [`KeyType::RsaPublic`],
+///   * [`KeyType::DsaPublic`],
+///   * [`KeyType::EcPublic`].
 /// - `message` is the data used to calculate the signature from.
 /// - `signature` is a message signature to be verified.
 /// - The functions returns `true` in case of a successful verification,
 ///   `false` otherwise.
+///
+/// [`KeyType::RsaPublic`]: enum.KeyType.html#variant.RsaPublic
+/// [`KeyType::DsaPublic`]: enum.KeyType.html#variant.DsaPublic
+/// [`KeyType::EcPublic`]: enum.KeyType.html#variant.EcPublic
 pub fn simple_verify_signature(algo: &DigestAlgorithm, pub_key: &Key,
                                message: &[u8], signature: &[u8]) -> Result<bool>
 {

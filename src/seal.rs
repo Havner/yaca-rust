@@ -69,7 +69,7 @@ impl SealContext {
     /// - `sym_key_length` defines the length of a generated symmetric
     ///   key, it must be at least 88 bits shorter than the `pub_key`
     ///   bit length.
-    /// - The function returns a tupple of context, generated and
+    /// - The function returns a tuple of context, generated and
     ///   encrypted symmetric key and generated Initialization Vector
     ///   of the default length for a given encryption configuration
     ///   (or `None`).

@@ -611,11 +611,11 @@ pub enum Padding {
 #[derive(Debug, PartialEq)]
 pub enum Kdf {
     /// ANSI X9.42 key derivation function, (shared secret derived
-    /// using Diffie-Helmann key exchange protocol).
+    /// using Diffie-Hellman key exchange protocol).
     X942,
 
     /// ANSI X9.62 key derivation function, (shared secret derived
-    /// using EC Diffie-Helmann key exchange protocol).
+    /// using EC Diffie-Hellman key exchange protocol).
     X962,
 }
 

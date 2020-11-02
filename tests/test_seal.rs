@@ -88,7 +88,7 @@ fn seal_rc2_property()
 }
 
 #[test]
-fn encrypt_gcm_property() -> std::result::Result<(), Box<dyn std::error::Error>>
+fn encrypt_gcm_property()
 {
     // prepare:
     let key_rsa_prv = Key::generate(&KeyType::RsaPrivate, &KeyLength::Bits(2048)).unwrap();
@@ -123,8 +123,6 @@ fn encrypt_gcm_property() -> std::result::Result<(), Box<dyn std::error::Error>>
     opened.append(&mut ctx.finalize().unwrap());
 
     assert_eq!(common::MSG.to_vec(), opened);
-
-    Ok(())
 }
 
 #[test]
