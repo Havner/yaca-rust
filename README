@@ -1,5 +1,0 @@
-YACA bindings for Rust.
-
-YACA library is required for bindings to work:
-- https://github.com/Havner/yaca/
-- https://developer.tizen.org/development/guides/native-application/security/cryptographic-operations
