@@ -38,9 +38,9 @@ pub trait Context {
     }
 }
 
-/// Implementation of `Padding` property
+/// Implementation of Padding property
 pub trait ContextWithPadding: Context {
-    /// Sets the `Padding` property
+    /// Sets the Padding property
     ///
     /// - This property can be set at the latest before the `::finalize()` call.
     fn set_property_padding(&self, padding: &Padding) -> Result<()>
@@ -64,9 +64,9 @@ pub trait ContextWithRc2Supported: Context {
     }
 }
 
-/// Implementation of `GCM`/`CCM` properties for `Encrypt`/`Seal`
+/// Implementation of GCM/CCM properties for `Encrypt`/`Seal`
 pub trait ContextWithXcmEncryptProperties: Context {
-    /// Sets the `GCM` tag length (in bytes)
+    /// Sets the GCM tag length (in bytes)
     ///
     /// - Supported tag lengths: 4, 8, 12, 13, 14, 15, 16.
     /// - Set after [`EncryptContext::finalize()`] / [`SealContext::finalize()`] and before
@@ -81,7 +81,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     {
         context_set_property_single(self, types::Property::GcmTagLen, gcm_tag_len)
     }
-    /// Gets the `GCM` tag
+    /// Gets the GCM tag
     ///
     /// - Get after [`EncryptContext::finalize()`] / [`SealContext::finalize()`].
     /// - See [`BlockCipherMode::Gcm`] for more information.
@@ -93,7 +93,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     {
         context_get_property_multiple(self, types::Property::GcmTag)
     }
-    /// Sets the `GCM` Additional Authentication Data
+    /// Sets the GCM Additional Authentication Data
     ///
     /// - AAD length can have any positive value.
     /// - Set after [`EncryptContext::initialize()`] / [`SealContext::initialize()`] and before
@@ -109,7 +109,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     {
         context_set_property_multiple(self, types::Property::GcmAad, gcm_aad)
     }
-    /// Sets the `CCM` Tag length in bytes
+    /// Sets the CCM Tag length in bytes
     ///
     /// - Supported tag lengths: 4-16 bytes in steps of 2 bytes.
     /// - Set after [`EncryptContext::initialize()`] / [`SealContext::initialize()`] and before
@@ -125,7 +125,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     {
         context_set_property_single(self, types::Property::CcmTagLen, ccm_tag_len)
     }
-    /// Gets the `CCM` tag
+    /// Gets the CCM tag
     ///
     /// - Get after [`EncryptContext::finalize()`] / [`SealContext::finalize()`].
     /// - See [`BlockCipherMode::Ccm`] for more information.
@@ -137,7 +137,7 @@ pub trait ContextWithXcmEncryptProperties: Context {
     {
         context_get_property_multiple(self, types::Property::CcmTag)
     }
-    /// Sets the `CCM` Additional Authentication Data
+    /// Sets the CCM Additional Authentication Data
     ///
     /// - AAD length can have any positive value.
     /// - The total plaintext length must be passed.
@@ -157,9 +157,9 @@ pub trait ContextWithXcmEncryptProperties: Context {
     // }
 }
 
-/// Implementation of `GCM`/`CCM` properties for `Decrypt`/`Open`
+/// Implementation of GCM/CCM properties for `Decrypt`/`Open`
 pub trait ContextWithXcmDecryptProperties: Context {
-    /// Sets the `GCM` tag
+    /// Sets the GCM tag
     ///
     /// - The tag is gotten during 'Encrypt'/'Seal' operation with
     ///   [`CtxXcmEnc::get_property_gcm_tag()`].
@@ -177,7 +177,7 @@ pub trait ContextWithXcmDecryptProperties: Context {
     {
         context_set_property_multiple(self, types::Property::GcmTag, gcm_tag)
     }
-    /// Sets the `GCM` Additional Authentication Data
+    /// Sets the GCM Additional Authentication Data
     ///
     /// - AAD is the same data that is passed during 'Encrypt'/'Seal' operation with
     ///   [`CtxXcmEnc::set_property_gcm_aad()`].
@@ -195,7 +195,7 @@ pub trait ContextWithXcmDecryptProperties: Context {
     {
         context_set_property_multiple(self, types::Property::GcmAad, gcm_aad)
     }
-    /// Sets the `CCM` tag
+    /// Sets the CCM tag
     ///
     /// - The tag is gotten during 'Encrypt'/'Seal' operation with
     ///   [`CtxXcmEnc::get_property_ccm_tag()`].
@@ -213,7 +213,7 @@ pub trait ContextWithXcmDecryptProperties: Context {
     {
         context_set_property_multiple(self, types::Property::CcmTag, ccm_tag)
     }
-    /// Sets the `CCM` Additional Authentication Data
+    /// Sets the CCM Additional Authentication Data
     ///
     /// - AAD is the same data that is passed during 'Encrypt'/'Seal' operation with
     ///   [`CtxXcmEnc::set_property_ccm_aad()`].
