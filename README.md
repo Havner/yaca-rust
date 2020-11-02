@@ -1,15 +1,11 @@
-[![Latest Version](https://img.shields.io/crates/v/yaca.svg)](https://crates.io/crates/yaca)
-[![Latest Version](https://docs.rs/yaca/badge.svg)](https://docs.rs/yaca)
-[![Apache 2.0 licensed](https://img.shields.io/badge/license-Apache2.0-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+# YACA bindings for Rust
 
-# YACA bindings for Rust.
+[![crate](https://img.shields.io/crates/v/yaca.svg)](https://crates.io/crates/yaca/)
+[![docs](https://docs.rs/yaca/badge.svg)](https://docs.rs/yaca/)
+[![license](https://img.shields.io/badge/license-Apache%202.0-green.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![repo](https://img.shields.io/github/v/tag/Havner/yaca-rust)](https://github.com/Havner/yaca-rust/)
 
-Documentation: https://docs.rs/yaca/  
-Repository: https://github.com/Havner/yaca-rust/
-
-YACA library is required for the bindings to work:
-- https://github.com/Havner/yaca/
-- https://developer.tizen.org/development/guides/native-application/security/cryptographic-operations
+[YACA](https://github.com/Havner/yaca/) library is required for the bindings to work.
 
 # YACA - Yet Another Crypto API
 

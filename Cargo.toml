@@ -1,14 +1,16 @@
 [package]
 name = "yaca"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Lukasz Pawelczyk <havner@gmail.com>"]
 edition = "2018"
-license = "Apache-2.0"
 description = "Bindings for the YACA library"
+license = "Apache-2.0"
+license-file = "LICENSE"
 readme = "README.md"
+keywords = ["crypto", "openssl", "simple"]
+categories = ["api-bindings", "cryptography"]
 documentation = "https://docs.rs/yaca/"
 repository = "https://github.com/Havner/yaca-rust/"
-keywords = ["crypto", "openssl", "simple"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
