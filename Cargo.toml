@@ -5,7 +5,6 @@ authors = ["Lukasz Pawelczyk <havner@gmail.com>"]
 edition = "2018"
 description = "Bindings for the YACA library"
 license = "Apache-2.0"
-license-file = "LICENSE"
 readme = "README.md"
 keywords = ["crypto", "openssl", "simple"]
 categories = ["api-bindings", "cryptography"]
