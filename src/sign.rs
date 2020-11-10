@@ -222,9 +222,9 @@ impl VerifyContext {
     /// [`KeyType::EcPublic`]: enum.KeyType.html#variant.EcPublic
     /// [`Padding::Pkcs1`]: enum.Padding.html#variant.Pkcs1
     /// [`CtxPad::set_property_padding()`]: trait.ContextWithPadding.html#method.set_property_padding
-    pub fn initialize(algo: &DigestAlgorithm, prv_key: &Key) -> Result<VerifyContext>
+    pub fn initialize(algo: &DigestAlgorithm, pub_key: &Key) -> Result<VerifyContext>
     {
-        verify_initialize(algo, prv_key)
+        verify_initialize(algo, pub_key)
     }
     /// Feeds the message into the digital signature verification algorithm
     ///
