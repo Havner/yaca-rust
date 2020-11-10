@@ -226,8 +226,8 @@ pub(crate) fn encrypt_rs_to_c(encrypt: &EncryptAlgorithm) -> c_int
     match encrypt {
         EncryptAlgorithm::Aes => YACA_ENCRYPT_AES,
         EncryptAlgorithm::UnsafeDes => YACA_ENCRYPT_UNSAFE_DES,
-        EncryptAlgorithm::UnsafeTrippleDes2Tdea => YACA_ENCRYPT_UNSAFE_3DES_2TDEA,
-        EncryptAlgorithm::TrippleDes3Tdea => YACA_ENCRYPT_3DES_3TDEA,
+        EncryptAlgorithm::UnsafeTripleDes2Tdea => YACA_ENCRYPT_UNSAFE_3DES_2TDEA,
+        EncryptAlgorithm::TripleDes3Tdea => YACA_ENCRYPT_3DES_3TDEA,
         EncryptAlgorithm::UnsafeRc2 => YACA_ENCRYPT_UNSAFE_RC2,
         EncryptAlgorithm::UnsafeRc4 => YACA_ENCRYPT_UNSAFE_RC4,
         EncryptAlgorithm::Cast5 => YACA_ENCRYPT_CAST5,

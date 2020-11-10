@@ -238,7 +238,7 @@ pub enum EncryptAlgorithm {
     /// [`ECB`]: enum.BlockCipherMode.html#variant.Ecb
     /// [`BlockCipherMode`]: enum.BlockCipherMode.html
     /// [`DES`]: enum.KeyType.html#variant.Des
-    UnsafeTrippleDes2Tdea,
+    UnsafeTripleDes2Tdea,
 
     /// 3DES 3-key encryption
     ///
@@ -264,7 +264,7 @@ pub enum EncryptAlgorithm {
     /// [`Wrap`]: enum.BlockCipherMode.html#variant.Wrap
     /// [`BlockCipherMode`]: enum.BlockCipherMode.html
     /// [`DES`]: enum.KeyType.html#variant.Des
-    TrippleDes3Tdea,
+    TripleDes3Tdea,
 
     /// RC2 encryption (unsafe)
     ///
@@ -526,20 +526,20 @@ pub enum BlockCipherMode {
     ///   [`64`] bit [`Initialization Vector`] is used.  
     ///   Wrapped key can be a [`128`], [`192`], or a [`256`] bit key.  
     ///   [`EncryptAlgorithm::Aes`] allows wrapping multiple keys together.
-    /// - Key used to do the wrapping with [`EncryptAlgorithm::UnsafeTrippleDes2Tdea`] can be a [`192`] bit [`DES`] key only.
+    /// - Key used to do the wrapping with [`EncryptAlgorithm::UnsafeTripleDes2Tdea`] can be a [`192`] bit [`DES`] key only.
     ///   Initialization Vector is not used.  
     ///   Wrapped key can be a [`128`] bit [`DES`] key (two-key), or a [`192`] bit [`DES`] key (three-key).  
-    ///   [`EncryptAlgorithm::UnsafeTrippleDes2Tdea`] allows wrapping only one key.
+    ///   [`EncryptAlgorithm::UnsafeTripleDes2Tdea`] allows wrapping only one key.
     ///
     /// [`AES`]: enum.EncryptAlgorithm.html#variant.Aes
     /// [`Initialization Vector`]: enum.KeyType.html#variant.Iv
-    /// [`3DES_3TDEA`]: enum.EncryptAlgorithm.html#variant.UnsafeTrippleDes2Tdea
+    /// [`3DES_3TDEA`]: enum.EncryptAlgorithm.html#variant.UnsafeTripleDes2Tdea
     /// [`EncryptContext::update()`]: struct.EncryptContext.html#method.update
     /// [`DecryptContext::update()`]: struct.DecryptContext.html#method.update
     /// [`SealContext::initialize()`]: struct.SealContext.html#method.initialize
     /// [`OpenContext::initialize()`]: struct.OpenContext.html#method.initialize
     /// [`EncryptAlgorithm::Aes`]: enum.EncryptAlgorithm.html#variant.Aes
-    /// [`EncryptAlgorithm::UnsafeTrippleDes2Tdea`]: enum.EncryptAlgorithm.html#variant.UnsafeTrippleDes2Tdea
+    /// [`EncryptAlgorithm::UnsafeTripleDes2Tdea`]: enum.EncryptAlgorithm.html#variant.UnsafeTrippleDes2Tdea
     /// [`64`]: enum.KeyLength.html#variant.Bits
     /// [`128`]: enum.KeyLength.html#variant.Bits
     /// [`192`]: enum.KeyLength.html#variant.Bits
