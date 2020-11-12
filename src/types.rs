@@ -275,7 +275,7 @@ pub enum EncryptAlgorithm {
     ///   Effective key bits can be set using [`CtxRc2::set_property_rc2_effective_key_bits()`].  
     ///   It can be set after [`EncryptContext::initialize()`] / [`DecryptContext::initialize()`],
     ///   and before [`EncryptContext::update()`] / [`DecryptContext::update()`] in
-    ///   encryption / decryption operation.
+    ///   `Encrypt`/`Decrypt` operation.
     /// - Supported block cipher modes:
     ///   * [`CBC`],
     ///   * [`OFB`],
@@ -586,7 +586,7 @@ pub enum Padding {
 
     /// EME-OAEP as defined in PKCS #1 v2.0 with SHA-1, MGF1 and an
     /// empty encoding parameter. Suitable for low-level `RSA`
-    /// public_encrypt/private_decrypt operations. For low-level
+    /// `public_encrypt`/`private_decrypt` operations. For low-level
     /// operations the input must be at least 42 bytes shorter than
     /// the key length.
     Pkcs1Oaep,
