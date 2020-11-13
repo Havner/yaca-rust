@@ -16,3 +16,6 @@ repository = "https://github.com/Havner/yaca-rust/"
 [dependencies]
 libc = "0.2.0"
 num = "0.2.1"
+
+[features]
+static = []
