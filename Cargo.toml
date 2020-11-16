@@ -14,7 +14,7 @@ repository = "https://github.com/Havner/yaca-rust/"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libc = "0.2.0"
+libc = "0.2"
 num-integer = "0.1"
 
 [features]
