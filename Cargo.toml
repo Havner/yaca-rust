@@ -1,6 +1,6 @@
 [package]
 name = "yaca"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Lukasz Pawelczyk <havner@gmail.com>"]
 edition = "2018"
 description = "Bindings for the YACA library"
