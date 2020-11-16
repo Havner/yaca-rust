@@ -17,7 +17,7 @@
  */
 
 use libc::{c_char, c_void};
-use num::Integer;
+use num_integer::Integer;
 use std::mem;
 use std::ptr;
 use std::cmp;
