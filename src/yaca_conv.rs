@@ -116,10 +116,77 @@ pub(crate) fn key_type_c_to_rs(kt: c_int) -> KeyType
 }
 
 const YACA_KEY_LENGTH_EC_PRIME192V1: c_int = 0x300000C0;
+const YACA_KEY_LENGTH_EC_PRIME192V2: c_int = 0x300100C0;
+const YACA_KEY_LENGTH_EC_PRIME192V3: c_int = 0x300200C0;
+const YACA_KEY_LENGTH_EC_PRIME239V1: c_int = 0x300000EF;
+const YACA_KEY_LENGTH_EC_PRIME239V2: c_int = 0x300100EF;
+const YACA_KEY_LENGTH_EC_PRIME239V3: c_int = 0x300200EF;
 const YACA_KEY_LENGTH_EC_PRIME256V1: c_int = 0x30000100;
-const YACA_KEY_LENGTH_EC_SECP256K1:  c_int = 0x31200100;
-const YACA_KEY_LENGTH_EC_SECP384R1:  c_int = 0x31100180;
-const YACA_KEY_LENGTH_EC_SECP521R1:  c_int = 0x31100209;
+
+const YACA_KEY_LENGTH_EC_C2PNB163V1: c_int = 0x340000A3;
+const YACA_KEY_LENGTH_EC_C2PNB163V2: c_int = 0x340100A3;
+const YACA_KEY_LENGTH_EC_C2PNB163V3: c_int = 0x340200A3;
+const YACA_KEY_LENGTH_EC_C2PNB176V1: c_int = 0x340000B0;
+const YACA_KEY_LENGTH_EC_C2TNB191V1: c_int = 0x350000BF;
+const YACA_KEY_LENGTH_EC_C2TNB191V2: c_int = 0x350100BF;
+const YACA_KEY_LENGTH_EC_C2TNB191V3: c_int = 0x350200BF;
+const YACA_KEY_LENGTH_EC_C2PNB208W1: c_int = 0x344000D0;
+const YACA_KEY_LENGTH_EC_C2TNB239V1: c_int = 0x350000EF;
+const YACA_KEY_LENGTH_EC_C2TNB239V2: c_int = 0x350100EF;
+const YACA_KEY_LENGTH_EC_C2TNB239V3: c_int = 0x350200EF;
+const YACA_KEY_LENGTH_EC_C2PNB272W1: c_int = 0x34400110;
+const YACA_KEY_LENGTH_EC_C2PNB304W1: c_int = 0x34400130;
+const YACA_KEY_LENGTH_EC_C2TNB359V1: c_int = 0x35000167;
+const YACA_KEY_LENGTH_EC_C2PNB368W1: c_int = 0x34400170;
+const YACA_KEY_LENGTH_EC_C2TNB431R1: c_int = 0x351001AF;
+
+const YACA_KEY_LENGTH_EC_SECP112R1: c_int = 0x31100070;
+const YACA_KEY_LENGTH_EC_SECP112R2: c_int = 0x31110070;
+const YACA_KEY_LENGTH_EC_SECP128R1: c_int = 0x31100080;
+const YACA_KEY_LENGTH_EC_SECP128R2: c_int = 0x31110080;
+const YACA_KEY_LENGTH_EC_SECP160K1: c_int = 0x312000A0;
+const YACA_KEY_LENGTH_EC_SECP160R1: c_int = 0x311000A0;
+const YACA_KEY_LENGTH_EC_SECP160R2: c_int = 0x311100A0;
+const YACA_KEY_LENGTH_EC_SECP192K1: c_int = 0x312000C0;
+const YACA_KEY_LENGTH_EC_SECP224K1: c_int = 0x312000E0;
+const YACA_KEY_LENGTH_EC_SECP224R1: c_int = 0x311000E0;
+const YACA_KEY_LENGTH_EC_SECP256K1: c_int = 0x31200100;
+const YACA_KEY_LENGTH_EC_SECP384R1: c_int = 0x31100180;
+const YACA_KEY_LENGTH_EC_SECP521R1: c_int = 0x31100209;
+
+const YACA_KEY_LENGTH_EC_SECT113R1: c_int = 0x32100071;
+const YACA_KEY_LENGTH_EC_SECT113R2: c_int = 0x32110071;
+const YACA_KEY_LENGTH_EC_SECT131R1: c_int = 0x32100083;
+const YACA_KEY_LENGTH_EC_SECT131R2: c_int = 0x32110083;
+const YACA_KEY_LENGTH_EC_SECT163K1: c_int = 0x322000A3;
+const YACA_KEY_LENGTH_EC_SECT163R1: c_int = 0x321000A3;
+const YACA_KEY_LENGTH_EC_SECT163R2: c_int = 0x321100A3;
+const YACA_KEY_LENGTH_EC_SECT193R1: c_int = 0x321000C1;
+const YACA_KEY_LENGTH_EC_SECT193R2: c_int = 0x321100C1;
+const YACA_KEY_LENGTH_EC_SECT233K1: c_int = 0x322000E9;
+const YACA_KEY_LENGTH_EC_SECT233R1: c_int = 0x321000E9;
+const YACA_KEY_LENGTH_EC_SECT239K1: c_int = 0x322000EF;
+const YACA_KEY_LENGTH_EC_SECT283K1: c_int = 0x3220011B;
+const YACA_KEY_LENGTH_EC_SECT283R1: c_int = 0x3210011B;
+const YACA_KEY_LENGTH_EC_SECT409K1: c_int = 0x32200199;
+const YACA_KEY_LENGTH_EC_SECT409R1: c_int = 0x32100199;
+const YACA_KEY_LENGTH_EC_SECT571K1: c_int = 0x3220023B;
+const YACA_KEY_LENGTH_EC_SECT571R1: c_int = 0x3210023B;
+
+const YACA_KEY_LENGTH_EC_BRAINPOOLP160R1: c_int = 0x331000A0;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP160T1: c_int = 0x333000A0;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP192R1: c_int = 0x331000C0;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP192T1: c_int = 0x333000C0;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP224R1: c_int = 0x331000E0;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP224T1: c_int = 0x333000E0;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP256R1: c_int = 0x33100100;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP256T1: c_int = 0x33300100;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP320R1: c_int = 0x33100140;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP320T1: c_int = 0x33300140;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP384R1: c_int = 0x33100180;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP384T1: c_int = 0x33300180;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP512R1: c_int = 0x33100200;
+const YACA_KEY_LENGTH_EC_BRAINPOOLP512T1: c_int = 0x33300200;
 
 const YACA_KEY_LENGTH_DH_RFC_1024_160: c_int = 0x20000400;
 const YACA_KEY_LENGTH_DH_RFC_2048_224: c_int = 0x21000800;
@@ -132,11 +199,80 @@ pub(crate) fn key_length_rs_to_c(kl: &KeyLength) -> size_t
 {
     match kl {
         KeyLength::Bits(bl) => *bl as size_t,
+
         KeyLength::Ec(Prime192V1) => YACA_KEY_LENGTH_EC_PRIME192V1 as size_t,
+        KeyLength::Ec(Prime192V2) => YACA_KEY_LENGTH_EC_PRIME192V2 as size_t,
+        KeyLength::Ec(Prime192V3) => YACA_KEY_LENGTH_EC_PRIME192V3 as size_t,
+        KeyLength::Ec(Prime239V1) => YACA_KEY_LENGTH_EC_PRIME239V1 as size_t,
+        KeyLength::Ec(Prime239V2) => YACA_KEY_LENGTH_EC_PRIME239V2 as size_t,
+        KeyLength::Ec(Prime239V3) => YACA_KEY_LENGTH_EC_PRIME239V3 as size_t,
         KeyLength::Ec(Prime256V1) => YACA_KEY_LENGTH_EC_PRIME256V1 as size_t,
+
+        KeyLength::Ec(C2pnb163V1) => YACA_KEY_LENGTH_EC_C2PNB163V1 as size_t,
+        KeyLength::Ec(C2pnb163V2) => YACA_KEY_LENGTH_EC_C2PNB163V2 as size_t,
+        KeyLength::Ec(C2pnb163V3) => YACA_KEY_LENGTH_EC_C2PNB163V3 as size_t,
+        KeyLength::Ec(C2pnb176V1) => YACA_KEY_LENGTH_EC_C2PNB176V1 as size_t,
+        KeyLength::Ec(C2tnb191V1) => YACA_KEY_LENGTH_EC_C2TNB191V1 as size_t,
+        KeyLength::Ec(C2tnb191V2) => YACA_KEY_LENGTH_EC_C2TNB191V2 as size_t,
+        KeyLength::Ec(C2tnb191V3) => YACA_KEY_LENGTH_EC_C2TNB191V3 as size_t,
+        KeyLength::Ec(C2pnb208W1) => YACA_KEY_LENGTH_EC_C2PNB208W1 as size_t,
+        KeyLength::Ec(C2tnb239V1) => YACA_KEY_LENGTH_EC_C2TNB239V1 as size_t,
+        KeyLength::Ec(C2tnb239V2) => YACA_KEY_LENGTH_EC_C2TNB239V2 as size_t,
+        KeyLength::Ec(C2tnb239V3) => YACA_KEY_LENGTH_EC_C2TNB239V3 as size_t,
+        KeyLength::Ec(C2pnb272W1) => YACA_KEY_LENGTH_EC_C2PNB272W1 as size_t,
+        KeyLength::Ec(C2pnb304W1) => YACA_KEY_LENGTH_EC_C2PNB304W1 as size_t,
+        KeyLength::Ec(C2tnb359V1) => YACA_KEY_LENGTH_EC_C2TNB359V1 as size_t,
+        KeyLength::Ec(C2pnb368W1) => YACA_KEY_LENGTH_EC_C2PNB368W1 as size_t,
+        KeyLength::Ec(C2tnb431R1) => YACA_KEY_LENGTH_EC_C2TNB431R1 as size_t,
+
+        KeyLength::Ec(Secp112R1) => YACA_KEY_LENGTH_EC_SECP112R1 as size_t,
+        KeyLength::Ec(Secp112R2) => YACA_KEY_LENGTH_EC_SECP112R2 as size_t,
+        KeyLength::Ec(Secp128R1) => YACA_KEY_LENGTH_EC_SECP128R1 as size_t,
+        KeyLength::Ec(Secp128R2) => YACA_KEY_LENGTH_EC_SECP128R2 as size_t,
+        KeyLength::Ec(Secp160K1) => YACA_KEY_LENGTH_EC_SECP160K1 as size_t,
+        KeyLength::Ec(Secp160R1) => YACA_KEY_LENGTH_EC_SECP160R1 as size_t,
+        KeyLength::Ec(Secp160R2) => YACA_KEY_LENGTH_EC_SECP160R2 as size_t,
+        KeyLength::Ec(Secp192K1) => YACA_KEY_LENGTH_EC_SECP192K1 as size_t,
+        KeyLength::Ec(Secp224K1) => YACA_KEY_LENGTH_EC_SECP224K1 as size_t,
+        KeyLength::Ec(Secp224R1) => YACA_KEY_LENGTH_EC_SECP224R1 as size_t,
         KeyLength::Ec(Secp256K1) => YACA_KEY_LENGTH_EC_SECP256K1 as size_t,
         KeyLength::Ec(Secp384R1) => YACA_KEY_LENGTH_EC_SECP384R1 as size_t,
         KeyLength::Ec(Secp521R1) => YACA_KEY_LENGTH_EC_SECP521R1 as size_t,
+
+        KeyLength::Ec(Sect113R1) => YACA_KEY_LENGTH_EC_SECT113R1 as size_t,
+        KeyLength::Ec(Sect113R2) => YACA_KEY_LENGTH_EC_SECT113R2 as size_t,
+        KeyLength::Ec(Sect131R1) => YACA_KEY_LENGTH_EC_SECT131R1 as size_t,
+        KeyLength::Ec(Sect131R2) => YACA_KEY_LENGTH_EC_SECT131R2 as size_t,
+        KeyLength::Ec(Sect163K1) => YACA_KEY_LENGTH_EC_SECT163K1 as size_t,
+        KeyLength::Ec(Sect163R1) => YACA_KEY_LENGTH_EC_SECT163R1 as size_t,
+        KeyLength::Ec(Sect163R2) => YACA_KEY_LENGTH_EC_SECT163R2 as size_t,
+        KeyLength::Ec(Sect193R1) => YACA_KEY_LENGTH_EC_SECT193R1 as size_t,
+        KeyLength::Ec(Sect193R2) => YACA_KEY_LENGTH_EC_SECT193R2 as size_t,
+        KeyLength::Ec(Sect233K1) => YACA_KEY_LENGTH_EC_SECT233K1 as size_t,
+        KeyLength::Ec(Sect233R1) => YACA_KEY_LENGTH_EC_SECT233R1 as size_t,
+        KeyLength::Ec(Sect239K1) => YACA_KEY_LENGTH_EC_SECT239K1 as size_t,
+        KeyLength::Ec(Sect283K1) => YACA_KEY_LENGTH_EC_SECT283K1 as size_t,
+        KeyLength::Ec(Sect283R1) => YACA_KEY_LENGTH_EC_SECT283R1 as size_t,
+        KeyLength::Ec(Sect409K1) => YACA_KEY_LENGTH_EC_SECT409K1 as size_t,
+        KeyLength::Ec(Sect409R1) => YACA_KEY_LENGTH_EC_SECT409R1 as size_t,
+        KeyLength::Ec(Sect571K1) => YACA_KEY_LENGTH_EC_SECT571K1 as size_t,
+        KeyLength::Ec(Sect571R1) => YACA_KEY_LENGTH_EC_SECT571R1 as size_t,
+
+        KeyLength::Ec(BrainpoolP160R1) => YACA_KEY_LENGTH_EC_BRAINPOOLP160R1 as size_t,
+        KeyLength::Ec(BrainpoolP160T1) => YACA_KEY_LENGTH_EC_BRAINPOOLP160T1 as size_t,
+        KeyLength::Ec(BrainpoolP192R1) => YACA_KEY_LENGTH_EC_BRAINPOOLP192R1 as size_t,
+        KeyLength::Ec(BrainpoolP192T1) => YACA_KEY_LENGTH_EC_BRAINPOOLP192T1 as size_t,
+        KeyLength::Ec(BrainpoolP224R1) => YACA_KEY_LENGTH_EC_BRAINPOOLP224R1 as size_t,
+        KeyLength::Ec(BrainpoolP224T1) => YACA_KEY_LENGTH_EC_BRAINPOOLP224T1 as size_t,
+        KeyLength::Ec(BrainpoolP256R1) => YACA_KEY_LENGTH_EC_BRAINPOOLP256R1 as size_t,
+        KeyLength::Ec(BrainpoolP256T1) => YACA_KEY_LENGTH_EC_BRAINPOOLP256T1 as size_t,
+        KeyLength::Ec(BrainpoolP320R1) => YACA_KEY_LENGTH_EC_BRAINPOOLP320R1 as size_t,
+        KeyLength::Ec(BrainpoolP320T1) => YACA_KEY_LENGTH_EC_BRAINPOOLP320T1 as size_t,
+        KeyLength::Ec(BrainpoolP384R1) => YACA_KEY_LENGTH_EC_BRAINPOOLP384R1 as size_t,
+        KeyLength::Ec(BrainpoolP384T1) => YACA_KEY_LENGTH_EC_BRAINPOOLP384T1 as size_t,
+        KeyLength::Ec(BrainpoolP512R1) => YACA_KEY_LENGTH_EC_BRAINPOOLP512R1 as size_t,
+        KeyLength::Ec(BrainpoolP512T1) => YACA_KEY_LENGTH_EC_BRAINPOOLP512T1 as size_t,
+
         KeyLength::Dh(Rfc1024_160) => YACA_KEY_LENGTH_DH_RFC_1024_160 as size_t,
         KeyLength::Dh(Rfc2048_224) => YACA_KEY_LENGTH_DH_RFC_2048_224 as size_t,
         KeyLength::Dh(Rfc2048_256) => YACA_KEY_LENGTH_DH_RFC_2048_256 as size_t,
@@ -152,10 +288,78 @@ pub(crate) fn key_length_c_to_rs(kl: size_t) -> KeyLength
     const MAX_BITS: c_int = std::u16::MAX as c_int;
     match kl as c_int {
         YACA_KEY_LENGTH_EC_PRIME192V1 => KeyLength::Ec(Prime192V1),
+        YACA_KEY_LENGTH_EC_PRIME192V2 => KeyLength::Ec(Prime192V2),
+        YACA_KEY_LENGTH_EC_PRIME192V3 => KeyLength::Ec(Prime192V3),
+        YACA_KEY_LENGTH_EC_PRIME239V1 => KeyLength::Ec(Prime239V1),
+        YACA_KEY_LENGTH_EC_PRIME239V2 => KeyLength::Ec(Prime239V2),
+        YACA_KEY_LENGTH_EC_PRIME239V3 => KeyLength::Ec(Prime239V3),
         YACA_KEY_LENGTH_EC_PRIME256V1 => KeyLength::Ec(Prime256V1),
+
+        YACA_KEY_LENGTH_EC_C2PNB163V1 => KeyLength::Ec(C2pnb163V1),
+        YACA_KEY_LENGTH_EC_C2PNB163V2 => KeyLength::Ec(C2pnb163V2),
+        YACA_KEY_LENGTH_EC_C2PNB163V3 => KeyLength::Ec(C2pnb163V3),
+        YACA_KEY_LENGTH_EC_C2PNB176V1 => KeyLength::Ec(C2pnb176V1),
+        YACA_KEY_LENGTH_EC_C2TNB191V1 => KeyLength::Ec(C2tnb191V1),
+        YACA_KEY_LENGTH_EC_C2TNB191V2 => KeyLength::Ec(C2tnb191V2),
+        YACA_KEY_LENGTH_EC_C2TNB191V3 => KeyLength::Ec(C2tnb191V3),
+        YACA_KEY_LENGTH_EC_C2PNB208W1 => KeyLength::Ec(C2pnb208W1),
+        YACA_KEY_LENGTH_EC_C2TNB239V1 => KeyLength::Ec(C2tnb239V1),
+        YACA_KEY_LENGTH_EC_C2TNB239V2 => KeyLength::Ec(C2tnb239V2),
+        YACA_KEY_LENGTH_EC_C2TNB239V3 => KeyLength::Ec(C2tnb239V3),
+        YACA_KEY_LENGTH_EC_C2PNB272W1 => KeyLength::Ec(C2pnb272W1),
+        YACA_KEY_LENGTH_EC_C2PNB304W1 => KeyLength::Ec(C2pnb304W1),
+        YACA_KEY_LENGTH_EC_C2TNB359V1 => KeyLength::Ec(C2tnb359V1),
+        YACA_KEY_LENGTH_EC_C2PNB368W1 => KeyLength::Ec(C2pnb368W1),
+        YACA_KEY_LENGTH_EC_C2TNB431R1 => KeyLength::Ec(C2tnb431R1),
+
+        YACA_KEY_LENGTH_EC_SECP112R1 => KeyLength::Ec(Secp112R1),
+        YACA_KEY_LENGTH_EC_SECP112R2 => KeyLength::Ec(Secp112R2),
+        YACA_KEY_LENGTH_EC_SECP128R1 => KeyLength::Ec(Secp128R1),
+        YACA_KEY_LENGTH_EC_SECP128R2 => KeyLength::Ec(Secp128R2),
+        YACA_KEY_LENGTH_EC_SECP160K1 => KeyLength::Ec(Secp160K1),
+        YACA_KEY_LENGTH_EC_SECP160R1 => KeyLength::Ec(Secp160R1),
+        YACA_KEY_LENGTH_EC_SECP160R2 => KeyLength::Ec(Secp160R2),
+        YACA_KEY_LENGTH_EC_SECP192K1 => KeyLength::Ec(Secp192K1),
+        YACA_KEY_LENGTH_EC_SECP224K1 => KeyLength::Ec(Secp224K1),
+        YACA_KEY_LENGTH_EC_SECP224R1 => KeyLength::Ec(Secp224R1),
         YACA_KEY_LENGTH_EC_SECP256K1 => KeyLength::Ec(Secp256K1),
         YACA_KEY_LENGTH_EC_SECP384R1 => KeyLength::Ec(Secp384R1),
         YACA_KEY_LENGTH_EC_SECP521R1 => KeyLength::Ec(Secp521R1),
+
+        YACA_KEY_LENGTH_EC_SECT113R1 => KeyLength::Ec(Sect113R1),
+        YACA_KEY_LENGTH_EC_SECT113R2 => KeyLength::Ec(Sect113R2),
+        YACA_KEY_LENGTH_EC_SECT131R1 => KeyLength::Ec(Sect131R1),
+        YACA_KEY_LENGTH_EC_SECT131R2 => KeyLength::Ec(Sect131R2),
+        YACA_KEY_LENGTH_EC_SECT163K1 => KeyLength::Ec(Sect163K1),
+        YACA_KEY_LENGTH_EC_SECT163R1 => KeyLength::Ec(Sect163R1),
+        YACA_KEY_LENGTH_EC_SECT163R2 => KeyLength::Ec(Sect163R2),
+        YACA_KEY_LENGTH_EC_SECT193R1 => KeyLength::Ec(Sect193R1),
+        YACA_KEY_LENGTH_EC_SECT193R2 => KeyLength::Ec(Sect193R2),
+        YACA_KEY_LENGTH_EC_SECT233K1 => KeyLength::Ec(Sect233K1),
+        YACA_KEY_LENGTH_EC_SECT233R1 => KeyLength::Ec(Sect233R1),
+        YACA_KEY_LENGTH_EC_SECT239K1 => KeyLength::Ec(Sect239K1),
+        YACA_KEY_LENGTH_EC_SECT283K1 => KeyLength::Ec(Sect283K1),
+        YACA_KEY_LENGTH_EC_SECT283R1 => KeyLength::Ec(Sect283R1),
+        YACA_KEY_LENGTH_EC_SECT409K1 => KeyLength::Ec(Sect409K1),
+        YACA_KEY_LENGTH_EC_SECT409R1 => KeyLength::Ec(Sect409R1),
+        YACA_KEY_LENGTH_EC_SECT571K1 => KeyLength::Ec(Sect571K1),
+        YACA_KEY_LENGTH_EC_SECT571R1 => KeyLength::Ec(Sect571R1),
+
+        YACA_KEY_LENGTH_EC_BRAINPOOLP160R1 => KeyLength::Ec(BrainpoolP160R1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP160T1 => KeyLength::Ec(BrainpoolP160T1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP192R1 => KeyLength::Ec(BrainpoolP192R1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP192T1 => KeyLength::Ec(BrainpoolP192T1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP224R1 => KeyLength::Ec(BrainpoolP224R1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP224T1 => KeyLength::Ec(BrainpoolP224T1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP256R1 => KeyLength::Ec(BrainpoolP256R1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP256T1 => KeyLength::Ec(BrainpoolP256T1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP320R1 => KeyLength::Ec(BrainpoolP320R1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP320T1 => KeyLength::Ec(BrainpoolP320T1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP384R1 => KeyLength::Ec(BrainpoolP384R1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP384T1 => KeyLength::Ec(BrainpoolP384T1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP512R1 => KeyLength::Ec(BrainpoolP512R1),
+        YACA_KEY_LENGTH_EC_BRAINPOOLP512T1 => KeyLength::Ec(BrainpoolP512T1),
+
         bl => {
             debug_assert!(bl % 8 == 0, "key_bit_length passed from C is not divisable by 8: {}", bl);
             debug_assert!(bl >= 8 && bl <= MAX_BITS, "Wrong key_bit_length passed from C: {}", bl);

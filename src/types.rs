@@ -108,14 +108,144 @@ pub enum KeyLength {
 pub enum KeyLengthEc {
     /// Elliptic curve prime192v1
     Prime192V1,
+    /// Elliptic curve prime192v2
+    Prime192V2,
+    /// Elliptic curve prime192v3
+    Prime192V3,
+    /// Elliptic curve prime239v1
+    Prime239V1,
+    /// Elliptic curve prime239v2
+    Prime239V2,
+    /// Elliptic curve prime239v3
+    Prime239V3,
     /// Elliptic curve prime256v1
     Prime256V1,
+
+    /// Elliptic curve c2pnb163v1
+    C2pnb163V1,
+    /// Elliptic curve c2pnb163v2
+    C2pnb163V2,
+    /// Elliptic curve c2pnb163v3
+    C2pnb163V3,
+    /// Elliptic curve c2pnb176v1
+    C2pnb176V1,
+    /// Elliptic curve c2tnb191v1
+    C2tnb191V1,
+    /// Elliptic curve c2tnb191v2
+    C2tnb191V2,
+    /// Elliptic curve c2tnb191v3
+    C2tnb191V3,
+    /// Elliptic curve c2pnb208w1
+    C2pnb208W1,
+    /// Elliptic curve c2tnb239v1
+    C2tnb239V1,
+    /// Elliptic curve c2tnb239v2
+    C2tnb239V2,
+    /// Elliptic curve c2tnb239v3
+    C2tnb239V3,
+    /// Elliptic curve c2pnb272w1
+    C2pnb272W1,
+    /// Elliptic curve c2pnb304w1
+    C2pnb304W1,
+    /// Elliptic curve c2tnb359v1
+    C2tnb359V1,
+    /// Elliptic curve c2pnb368w1
+    C2pnb368W1,
+    /// Elliptic curve c2tnb431r1
+    C2tnb431R1,
+
+    /// Elliptic curve secp112r1
+    Secp112R1,
+    /// Elliptic curve secp112r2
+    Secp112R2,
+    /// Elliptic curve secp128r1
+    Secp128R1,
+    /// Elliptic curve secp128r2
+    Secp128R2,
+    /// Elliptic curve secp160k1
+    Secp160K1,
+    /// Elliptic curve secp160r1
+    Secp160R1,
+    /// Elliptic curve secp160r2
+    Secp160R2,
+    /// Elliptic curve secp192k1
+    Secp192K1,
+    /// Elliptic curve secp224k1
+    Secp224K1,
+    /// Elliptic curve secp224r1
+    Secp224R1,
     /// Elliptic curve secp256k1
     Secp256K1,
     /// Elliptic curve secp384r1
     Secp384R1,
     /// Elliptic curve secp521r1
     Secp521R1,
+
+    /// Elliptic curve sect113r1
+    Sect113R1,
+    /// Elliptic curve sect113r2
+    Sect113R2,
+    /// Elliptic curve sect131r1
+    Sect131R1,
+    /// Elliptic curve sect131r2
+    Sect131R2,
+    /// Elliptic curve sect163k1
+    Sect163K1,
+    /// Elliptic curve sect163r1
+    Sect163R1,
+    /// Elliptic curve sect163r2
+    Sect163R2,
+    /// Elliptic curve sect193r1
+    Sect193R1,
+    /// Elliptic curve sect193r2
+    Sect193R2,
+    /// Elliptic curve sect233k1
+    Sect233K1,
+    /// Elliptic curve sect233r1
+    Sect233R1,
+    /// Elliptic curve sect239k1
+    Sect239K1,
+    /// Elliptic curve sect283k1
+    Sect283K1,
+    /// Elliptic curve sect283r1
+    Sect283R1,
+    /// Elliptic curve sect409k1
+    Sect409K1,
+    /// Elliptic curve sect409r1
+    Sect409R1,
+    /// Elliptic curve sect571k1
+    Sect571K1,
+    /// Elliptic curve sect571r1
+    Sect571R1,
+
+    /// Elliptic curve brainpoolP160r1
+    BrainpoolP160R1,
+    /// Elliptic curve brainpoolP160t1
+    BrainpoolP160T1,
+    /// Elliptic curve brainpoolP192r1
+    BrainpoolP192R1,
+    /// Elliptic curve brainpoolP192t1
+    BrainpoolP192T1,
+    /// Elliptic curve brainpoolP224r1
+    BrainpoolP224R1,
+    /// Elliptic curve brainpoolP224t1
+    BrainpoolP224T1,
+    /// Elliptic curve brainpoolP256r1
+    BrainpoolP256R1,
+    /// Elliptic curve brainpoolP256t1
+    BrainpoolP256T1,
+    /// Elliptic curve brainpoolP320r1
+    BrainpoolP320R1,
+    /// Elliptic curve brainpoolP320t1
+    BrainpoolP320T1,
+    /// Elliptic curve brainpoolP384r1
+    BrainpoolP384R1,
+    /// Elliptic curve brainpoolP384t1
+    BrainpoolP384T1,
+    /// Elliptic curve brainpoolP512r1
+    BrainpoolP512R1,
+    /// Elliptic curve brainpoolP512t1
+    BrainpoolP512T1,
 }
 
 /// Enumeration of various YACA DH parameters including RFC 5114
