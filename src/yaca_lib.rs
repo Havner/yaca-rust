@@ -183,4 +183,18 @@ extern {
                               message_len: size_t) -> c_int;
     pub fn yaca_verify_finalize(ctx: *mut c_void, signature: *const c_char,
                                 signature_len: size_t) -> c_int;
+
+    // unsupported
+    pub fn yaca_key_rsa_generate(key_bit_len: size_t, key_pub_exp: u64,
+                                 key: *mut *const c_void) -> c_int;
+    pub fn yaca_key_rsa_get_public_exponent(key: *const c_void,
+                                            key_pub_exp: *mut u64) -> c_int;
+    pub fn yaca_rsa_public_encrypt_2(padding: c_int, digest: c_int, pub_key: *const c_void,
+                                     plaintext: *const c_char, plaintext_len: size_t,
+                                     ciphertext: *mut *const c_char,
+                                     ciphertext_len: *mut size_t) -> c_int;
+    pub fn yaca_rsa_private_decrypt_2(padding: c_int, digest: c_int, prv_key: *const c_void,
+                                      ciphertext: *const c_char, ciphertext_len: size_t,
+                                      plaintext: *mut *const c_char,
+                                      plaintext_len: *mut size_t) -> c_int;
 }

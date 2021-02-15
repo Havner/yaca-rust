@@ -160,6 +160,7 @@ mod digest;
 mod encrypt;
 mod seal;
 mod sign;
+pub mod unsupported;
 
 
 /// Include this prelude with `use yaca::prelude::*` to access required traits.
