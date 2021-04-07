@@ -145,6 +145,7 @@
 //!}
 //! ```
 
+#![feature(static_nobundle)]
 
 mod yaca_common;
 mod yaca_lib;
@@ -161,6 +162,7 @@ mod encrypt;
 mod seal;
 mod sign;
 pub mod unsupported;
+pub mod unsupported_km;
 
 
 /// Include this prelude with `use yaca::prelude::*` to access required traits.
