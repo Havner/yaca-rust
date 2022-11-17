@@ -277,9 +277,9 @@ pub(crate) fn key_length_rs_to_c(kl: &KeyLength) -> size_t
         KeyLength::Dh(Rfc2048_224) => YACA_KEY_LENGTH_DH_RFC_2048_224 as size_t,
         KeyLength::Dh(Rfc2048_256) => YACA_KEY_LENGTH_DH_RFC_2048_256 as size_t,
         KeyLength::Dh(Generator2Bits(bl)) =>
-            (YACA_KEY_LENGTH_DH_GENERATOR_2 as size_t | *bl as size_t),
+            YACA_KEY_LENGTH_DH_GENERATOR_2 as size_t | *bl as size_t,
         KeyLength::Dh(Generator5Bits(bl)) =>
-            (YACA_KEY_LENGTH_DH_GENERATOR_5 as size_t | *bl as size_t),
+            YACA_KEY_LENGTH_DH_GENERATOR_5 as size_t | *bl as size_t,
     }
 }
 
